@@ -9,4 +9,5 @@ type Worker struct {
 
 func (w *Worker) Handler(t task.Task) error {
     t.Runnable.Start()
+    return nil
 }
