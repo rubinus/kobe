@@ -18,7 +18,7 @@ var privilegeEscalationOptions = []string{
 
 var playbookOptions = []string{
     "ask-vault-pass", "check", "diff", "extra-vars", "flush-cache", "force-handlers", "forks",
-    "help", "inventory", "inventory-file", "limit", "list-hosts", "list-tags", "list-tasks", "module-path",
+    "help", "inventorys", "inventorys-file", "limit", "list-hosts", "list-tags", "list-tasks", "module-path",
     "skip-tags", "start-at-task", "step", "syntax-check", "tags", "vault-id", "vault-password-file",
     "verbose", "version",
 }

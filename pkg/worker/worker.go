@@ -7,6 +7,8 @@ type Worker struct {
     config Config
 }
 
+
+
 func (w *Worker) Handler(t task.Task) error {
     t.Runnable.Start()
     return nil
