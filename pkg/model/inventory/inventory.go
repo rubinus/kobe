@@ -1,11 +1,11 @@
 package inventory
 
+import (
+	"kobe/pkg/ansible"
+	"kobe/pkg/model"
+)
+
 type Inventory struct {
-    Groups []Group `json:"groups"`
-    Hosts  []Host  `json:"hosts"`
+	*model.Model
+	*ansible.BaseInventory
 }
-
-func NewInventory(groups []Group, hosts []Host) *Inventory {
-    return &Inventory{Groups: groups, Hosts: hosts}
-}
-
