@@ -1,28 +1,46 @@
 package playbook
 
 import (
-	"kobe/pkg/ansible"
+    "io/ioutil"
+    "kobe/pkg/ansible"
+    "kobe/pkg/model"
+    "log"
+    "path"
 )
 
-//var cache Cache
+var Cache *model.Cache
 
 func init() {
-	//cache = Cache{
-	//	items: map[string]*Playbook{},
-	//}
+    Cache = model.NewCache()
+    lookup()
 }
 
 type Playbook struct {
-	Id   string
-	Name string
-	base ansible.BasePlaybook
+    *ansible.BasePlaybook
+    *model.Model
 }
 
-//
-//func (p *Playbook) Manager() {
-////Manager	manager := model.Manager{
-////		cache: cache,
-////		t:     reflect.TypeOf(Playbook{}),
-////	}
-//
-//}
+func NewPlaybook(name string, path string) *Playbook {
+    return &Playbook{
+        BasePlaybook: &ansible.BasePlaybook{Path: path},
+        Model:        &model.Model{Name: name},
+    }
+}
+
+func lookup() {
+    baseDir := "data/playbooks"
+    list, err := ioutil.ReadDir(baseDir)
+    log.Println("lookup playbooks")
+    if err != nil {
+        log.Printf("look up playbook error: %s", err)
+        return
+    }
+    for _, item := range list {
+        if !item.IsDir() {
+            continue
+        }
+        p := path.Join(baseDir, item.Name())
+        book := NewPlaybook(item.Name(), p)
+        Cache.CreateOrUpdate(book.Name, book)
+    }
+}

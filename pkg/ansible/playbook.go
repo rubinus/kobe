@@ -1,5 +1,5 @@
 package ansible
 
 type BasePlaybook struct {
-    Path string
+    Path string `json:"path"`
 }

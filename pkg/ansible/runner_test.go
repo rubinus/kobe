@@ -1,14 +1,14 @@
 package ansible
 
 import (
-    "fmt"
+    "log"
     "testing"
 )
 
 func TestPlaybookRunner_Run(t *testing.T) {
-    //play := BasePlaybook{
-    //    Path: "data/playbooks/test.yml",
-    //}
+    play := BasePlaybook{
+        Path: "/Users/shenchenyang/go/src/github.com/kobe/data/playbooks/test/test.yml",
+    }
 
     host := BaseHost{
         Hostname: "test",
@@ -25,26 +25,20 @@ func TestPlaybookRunner_Run(t *testing.T) {
         Hosts:    []BaseHost{host},
         Children: []BaseGroup{},
     }
+    c := CallBack{
+        onError: func() {
+            log.Println("error")
+        },
+        onSuccess: func() {
+            log.Println("success")
+        },
+    }
     bi := NewBaseInventory(group.Hosts, []BaseGroup{group})
-    fmt.Println(bi.String())
-
-    //log.Println(inv.Json())
-    //back := CallBack{
-    //    onSuccess: func() {
-    //        fmt.Println("success")
-    //    },
-    //    onError: func() {
-    //        fmt.Println("error")
-    //    },
-    //}
-    //rn := PlaybookRunner{
-    //   Inventory: inv,
-    //   Playbook:  play,
-    //   Options:   map[string]interface{}{},
-    //}
-    //err := rn.Run(&back)
-    //if err != nil {
-    //   fmt.Println(err)
-    //}
-
+    runner := PlaybookRunner{
+        BasePlaybook:  &play,
+        BaseInventory: bi,
+        WorkPath:      "/Users/shenchenyang/go/src/github.com/kobe/data/task/1/",
+        Options:       map[string]interface{}{},
+    }
+    _ = runner.Run(&c)
 }

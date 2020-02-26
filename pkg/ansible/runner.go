@@ -5,6 +5,7 @@ import (
     "kobe/pkg/util"
     "os"
     "os/exec"
+    "path"
 )
 
 var connectionOptions = []string{
@@ -28,14 +29,18 @@ type Runnable interface {
 }
 
 type PlaybookRunner struct {
-    Playbook  BasePlaybook
-    Inventory BaseInventory
-    Options   map[string]interface{}
+    *BasePlaybook
+    *BaseInventory
+    WorkPath string
+    Options  map[string]interface{}
 }
 
 func (p *PlaybookRunner) Run(callback *CallBack) error {
+    currentPath, _ := os.Getwd()
+    _ = os.Chdir(p.WorkPath)
+    inventoryPath, _ := p.CreateInventory()
     allOptions := append(append(connectionOptions, privilegeEscalationOptions...), playbookOptions...)
-    notSupportOptions := make([]string, 10)
+    notSupportOptions := make([]string, 0)
     for option, _ := range p.Options {
         if !collection.Collect(allOptions).Has(option) {
             notSupportOptions = append(notSupportOptions, option)
@@ -43,7 +48,10 @@ func (p *PlaybookRunner) Run(callback *CallBack) error {
             continue
         }
     }
+
     args := util.ArgsToStringArray(p.Options)
+    args = append(args, "-i", inventoryPath)
+    args = append(args, p.BasePlaybook.Path)
     cmd := exec.Command("ansible-playbook", args...)
     cmd.Stdout = os.Stdout
     cmd.Stderr = os.Stderr
@@ -55,5 +63,19 @@ func (p *PlaybookRunner) Run(callback *CallBack) error {
     } else {
         callback.onError()
     }
+    _ = os.Chdir(currentPath)
     return nil
+}
+
+func (p *PlaybookRunner) CreateInventory() (string, error) {
+    inventoryPath := path.Join(p.WorkPath, "hosts.json")
+    var f *os.File
+    if _, err := os.Stat(inventoryPath); err != nil {
+        f, _ = os.Create(inventoryPath)
+    } else {
+        f, _ = os.Open(inventoryPath)
+    }
+    defer f.Close()
+    _, _ = f.WriteString(p.BaseInventory.String())
+    return inventoryPath, nil
 }

@@ -10,7 +10,7 @@ func ArgToStringArray(name string, value interface{}) [2]string {
 }
 
 func ArgsToStringArray(args map[string]interface{}) []string {
-    result := make([]string, 10)
+    result := make([]string, 0)
     for name, value := range args {
         arg := ArgToStringArray(name, value)
         result = append(append(result, arg[0], ), arg[1])
