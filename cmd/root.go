@@ -12,9 +12,14 @@ import (
 var cfgFile string
 
 var rootCmd = &cobra.Command{
-	Use:   "kobe",
-	Short: "ansible rest api",
-	Long:  ``,
+	Use:   "cmd",
+	Short: "A brief description of your application",
+	Long: `A longer description that spans multiple lines and likely contains
+examples and usage of using your application. For example:
+
+Cobra is a CLI library for Go that empowers applications.
+This application is a tool to generate the needed files
+to quickly create a Cobra application.`,
 }
 
 func Execute() {
@@ -26,8 +31,7 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cmd.yaml)")
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/kobe.yaml)")
 }
 
 func initConfig() {
@@ -41,11 +45,9 @@ func initConfig() {
 		}
 
 		viper.AddConfigPath(home)
-		viper.SetConfigName(".cmd")
+		viper.SetConfigName("kobe.yaml")
 	}
-
 	viper.AutomaticEnv()
-
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
 	}
