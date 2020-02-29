@@ -1,46 +1,23 @@
 package worker
 
 import (
-	"github.com/go-redis/redis/v7"
-	"github.com/spf13/cobra/cobra/cmd"
-	b "kobe/pkg/broker"
-	"kobe/pkg/worker/task"
-	"log"
+	uuid "github.com/satori/go.uuid"
+	"kobe/pkg/db"
+	"kobe/pkg/logger"
+	"kobe/pkg/models"
 )
-import _ "kobe/pkg/broker"
 
-type Worker struct {
-	Id     string
-	broker b.Broker
-}
+var log = logger.Logger
 
-func (w *Worker) Run() {
-	w.broker = b.Broker{
-		Client: redis.NewClient(&redis.Options{
-			Addr: "localhost:6379",
-			DB:   0,
-		}),
+func Run() {
+	db.Connect()
+	s := db.Session.Clone()
+	defer s.Close()
+	d := s.DB(db.Mongo.Database)
+	worker := models.Worker{
+		Db:    d,
+		State: models.StateWorkerOnline,
+		Id:    uuid.NewV4().String(),
 	}
-	for {
-		t, err := w.broker.GetTask()
-		if err != nil {
-			log.Println(err)
-		}
-		w.Handler(t)
-	}
-
-}
-
-func PlaybookHandler(t *task.PlaybookTask) *task.Result {
-	r, err := t.GetRunner()
-	if err != nil {
-		log.Println(err)
-	}
-	state := make(chan int)
-	pid, err := r.Run()
-	go getState(pid)
-	<-state
-}
-
-func getState(pid string, chan int)  {
+	worker.Listen()
 }

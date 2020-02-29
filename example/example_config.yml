@@ -1,1 +1,6 @@
-name: kobe
+server:
+  bind: 0.0.0.0:8080
+  db:
+    name: "kobe"
+    host: "127.0.0.1"
+    port: 27017
