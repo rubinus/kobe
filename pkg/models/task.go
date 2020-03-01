@@ -10,7 +10,7 @@ const (
 )
 
 type Task struct {
-	Id           string    `json:"-" bson:"_id"`
+	Id           string    `json:"-" bson:"_id,omitempty"`
 	Uid          string    `json:"uid" bson:"uid"`
 	State        string    `json:"state" bson:"state"`
 	Success      bool      `json:"success" bson:"success"`

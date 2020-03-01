@@ -6,6 +6,7 @@ import (
 	"kobe/pkg/api/inventory"
 	"kobe/pkg/api/playbook"
 	"kobe/pkg/api/task"
+	"kobe/pkg/api/worker"
 	"kobe/pkg/db"
 	"kobe/pkg/middlewares"
 )
@@ -39,6 +40,10 @@ func Run() error {
 			t.GET("/", task.List)
 			t.GET("/:uid", task.Get)
 			t.POST("/", task.Create)
+		}
+		w := v1.Group("/workers")
+		{
+			w.GET("/",worker.List)
 		}
 	}
 	bind := viper.GetString("server.bind")

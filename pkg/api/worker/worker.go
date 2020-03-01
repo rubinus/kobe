@@ -11,10 +11,11 @@ const modelName = "worker"
 
 func List(ctx *gin.Context) {
 	db := ctx.MustGet("db").(*mgo.Database)
-	var workers []models.Worker
+	var workers = []models.Worker{}
 	err := db.C(modelName).Find(nil).All(&workers)
 	if err != nil {
-		err.Error()
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
 	}
 	ctx.JSON(http.StatusOK, workers)
 }

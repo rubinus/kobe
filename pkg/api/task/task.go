@@ -2,6 +2,7 @@ package task
 
 import (
 	"github.com/gin-gonic/gin"
+	uuid "github.com/satori/go.uuid"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"kobe/pkg/models"
@@ -26,7 +27,7 @@ func Create(ctx *gin.Context) {
 	t.State = models.TaskStateScheduling
 	t.Success = false
 	t.Scheduled = false
-
+	t.Uid = uuid.NewV4().String()
 	if err := c.Insert(t); err != nil {
 		ctx.JSON(http.StatusBadRequest, err.Error())
 		return

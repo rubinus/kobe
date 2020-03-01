@@ -9,7 +9,7 @@ var Logger *log.Entry
 
 func init() {
 	log.SetHandler(Default)
-	log.SetLevel(log.InfoLevel)
+	log.SetLevel(log.DebugLevel)
 	Logger = log.WithFields(log.Fields{
 		"timestamp": time.Now().Format("2006-01-02 15:04:05"),
 	})
