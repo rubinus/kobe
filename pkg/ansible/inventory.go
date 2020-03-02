@@ -1,47 +1,37 @@
 package ansible
 
-import (
-    "encoding/json"
-    "log"
-)
-
 type BaseInventory struct {
-    Hosts  []BaseHost
-    Groups []BaseGroup
+	Hosts  []BaseHost
+	Groups []BaseGroup
 }
 
-func NewBaseInventory(hosts []BaseHost, groups []BaseGroup) *BaseInventory {
-    i := BaseInventory{Hosts: hosts, Groups: groups}
-    return &i
-}
-
-func (bi BaseInventory) Data() map[string]interface{} {
-    localhost := BaseHost{
-        Hostname: "localhost",
-        Vars: map[string]interface{}{
-            "ansible_ssh_host":   "172.0.0.1",
-            "ansible_connection": "local",
-        },
-    }
-    hosts := append(bi.Hosts, localhost)
-    allGroup := BaseGroup{
-        Name:     "all",
-        Vars:     map[string]interface{}{},
-        Hosts:    hosts,
-        Children: []BaseGroup{},
-    }
-    groups := append(bi.Groups, allGroup)
-    inventoryData := make(map[string]interface{})
-    for _, group := range groups {
-        inventoryData[group.Name] = group.Data()
-    }
-    return inventoryData
-}
-
-func (bi BaseInventory) String() string {
-    bytes, err := json.Marshal(bi.Data())
-    if err != nil {
-        log.Printf("parse json error: %s", bytes)
-    }
-    return string(bytes)
+func (bi BaseInventory) Data() map[string]map[string]interface{} {
+	data := map[string]map[string]interface{}{}
+	allGroup := BaseGroup{
+		Name:  "all",
+		Hosts: map[string]interface{}{},
+	}
+	localhost := BaseHost{
+		Hostname: "localhost",
+		Vars: map[string]interface{}{
+			"ansible_connection": "local",
+			"ansible_ssh_port":   22,
+			"ansible_ssh_user":   "root",
+		},
+	}
+	hosts := append(bi.Hosts, localhost)
+	hostsMap := map[string]interface{}{}
+	for _, host := range hosts {
+		for k, v := range host.Data() {
+			hostsMap[k] = v
+		}
+	}
+	allGroup.Hosts = hostsMap
+	groups := append(bi.Groups, allGroup)
+	for _, group := range groups {
+		for k, v := range group.Data() {
+			data[k] = v
+		}
+	}
+	return data
 }

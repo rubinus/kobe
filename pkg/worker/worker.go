@@ -56,17 +56,19 @@ func (w *Container) Listen() {
 	}
 }
 
+type Runnable interface {
+	Run(args map[string]interface{}, workPath string, stdout *os.File) (models.Result, error)
+}
+
 func (w *Container) work() error {
 	w.CurrentTask.State = models.TaskStateRunning
-	w.CurrentTask.StartTime = time.Now()
 	_ = w.saveTask()
-	p := w.CurrentTask.Playbook
-	i := w.CurrentTask.Inventory
-	fmt.Printf("handle task %s %s", p, i)
+
+	// runner 所需要参数  playbook inventory args workPath logfile
+
 	time.Sleep(10 * time.Second)
 	fmt.Println("handle task success")
 	w.CurrentTask.State = models.TaskStateFinished
-	w.CurrentTask.EndTime = time.Now()
 	return w.saveTask()
 }
 

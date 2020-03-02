@@ -1,22 +1,18 @@
 package ansible
 
 type BaseGroup struct {
-    Name     string
-    Vars     map[string]interface{}
-    Hosts    []BaseHost
-    Children []BaseGroup
+	Name     string
+	Vars     map[string]interface{}
+	Hosts    map[string]interface{}
+	Children map[string]interface{}
 }
 
-func (bg BaseGroup) Data() map[string]interface{} {
-    groupData := make(map[string]interface{})
-    groupData["hosts"] = make([]string, 0)
-    groupData["children"] = make(map[string]interface{}, 0)
-    for _, host := range bg.Hosts {
-        groupData["hosts"] = host.Data()
-    }
-    for _, children := range bg.Children {
-        groupData[children.Name] = map[string]interface{}{}
-    }
-    groupData["vars"] = bg.Vars
-    return groupData
+func (g *BaseGroup) Data() map[string]map[string]interface{} {
+	data := map[string]map[string]interface{}{}
+	data[g.Name] = map[string]interface{}{
+		"vars":     g.Vars,
+		"hosts":    g.Hosts,
+		"children": g.Children,
+	}
+	return data
 }

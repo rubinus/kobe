@@ -1,13 +1,15 @@
 package ansible
 
 import (
-	"github.com/chenhg5/collection"
-	"io"
-	"kobe/pkg/util"
+	"fmt"
+	"gopkg.in/mgo.v2/bson"
+	"kobe/pkg/db"
+	"kobe/pkg/logger"
+	"kobe/pkg/models"
 	"os"
 	"os/exec"
 	"path"
-	"sync"
+	"time"
 )
 
 var connectionOptions = []string{
@@ -26,72 +28,79 @@ var playbookOptions = []string{
 	"verbose", "version",
 }
 
-type runner struct {
-	*BaseInventory
-	WorkPath string
-	Stdout   io.Writer
-	Options  map[string]interface{}
-	mutex    sync.Mutex
-}
+var log = logger.Logger
 
-func (r runner) SetOption(name string, value interface{}) {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
-	r.Options[name] = value
-}
+type PlaybookRunner struct{}
 
-type PlaybookRunner struct {
-	Playbook *BasePlaybook
-	*runner
-}
-
-func NewPlaybookRunner(playbook *BasePlaybook, inventory *BaseInventory, workPath string, stdout io.Writer) *PlaybookRunner {
-	return &PlaybookRunner{
-		Playbook: playbook,
-		runner: &runner{
-			BaseInventory: inventory,
-			WorkPath:      workPath,
-			Options:       map[string]interface{}{},
-			Stdout:        stdout,
-		}}
-}
-
-func (p *PlaybookRunner) Run() (int, error) {
-	currentPath, _ := os.Getwd()
-	_ = os.Chdir(p.WorkPath)
-	inventoryPath, _ := p.CreateInventory()
-	allOptions := append(append(connectionOptions, privilegeEscalationOptions...), playbookOptions...)
-	notSupportOptions := make([]string, 0)
-	for option, _ := range p.Options {
-		if !collection.Collect(allOptions).Has(option) {
-			notSupportOptions = append(notSupportOptions, option)
-			delete(p.Options, option)
-			continue
-		}
+func (pr *PlaybookRunner) Run(args map[string]interface{}, workPath string, stdout *os.File) (*models.Result, error) {
+	pwd, err := os.Getwd()
+	defer os.Chdir(pwd)
+	if err != nil {
+		log.Errorf("can not get pwd, reason: %s", err)
+		return nil, err
 	}
-
-	args := util.ArgsToStringArray(p.Options)
-	args = append(args, "-i", inventoryPath)
-	args = append(args, p.Playbook.Path)
-	cmd := exec.Command("ansible-playbook", args...)
-	cmd.Stdout = p.Stdout
-	cmd.Stderr = p.Stdout
-	if err := cmd.Start(); err != nil {
-		return 0, err
+	if err := os.Chdir(workPath); err != nil {
+		log.Errorf("can not chdir %s", err)
+		return nil, err
 	}
-	_ = os.Chdir(currentPath)
-	return cmd.ProcessState.Pid(), nil
-}
+	inventory, playbook, options, err := handleArgs(args)
+	if err != nil {
+		log.Errorf("can not parse args", err.Error())
+		return nil, err
+	}
+	line := []string{}
+	line := append(line, "-i", inventory)
+	for k, v := range options {
+		line = append(line, fmt.Sprintf("--%s", k))
+		line = append(line, v)
+	}
+	line = append(line, playbook.Path)
 
-func (p *PlaybookRunner) CreateInventory() (string, error) {
-	inventoryPath := path.Join(p.WorkPath, "hosts.json")
-	var f *os.File
-	if _, err := os.Stat(inventoryPath); err != nil {
-		f, _ = os.Create(inventoryPath)
+	cmd := exec.Command("ansible-playbook", line...)
+	cmd.Stdout = stdout
+	cmd.Stderr = stdout
+
+	start := time.Now()
+	result := models.Result{
+		StartTime: &start,
+		ExitCode:  0,
+		Message:   "",
+	}
+	if err := cmd.Run(); err != nil {
+		result.Message = err.Error()
+		result.Finished = false
+		return &result, nil
+	}
+	end := time.Now()
+	result.Finished = true
+	result.EndTime = &end
+	result.ExitCode = cmd.ProcessState.ExitCode()
+	return &result, nil
+}
+func handleArgs(args map[string]interface{}) (*BaseInventory, *BasePlaybook, map[string]string, error) {
+	session := db.Session.Clone()
+	d := session.DB(db.Mongo.Database)
+	inventoryName := args["inventory"]
+	playbookName := args["playbook"]
+	var inventory models.Inventory
+	var playbook models.Playbook
+	if err := d.C("inventory").Find(bson.M{"name": inventoryName}).One(&inventory); err != nil {
+		log.Errorf("can not find inventory %s reason %s", inventoryName, err)
+		return nil, nil, nil, err
+	}
+	if err := d.C("playbook").Find(bson.M{"name": playbookName}).One(&playbook); err != nil {
+		log.Errorf("can not find playbook %s reason %s", inventoryName, err)
+		return nil, nil, nil, err
+	}
+	options := map[string]string{}
+	_, ok := args["options"]
+	if ok {
+		options = args["options"].(map[string]string)
 	} else {
-		f, _ = os.Open(inventoryPath)
+		options = make(map[string]string)
 	}
-	defer f.Close()
-	_, _ = f.WriteString(p.BaseInventory.String())
-	return inventoryPath, nil
+	baseInventory := inventory.Base()
+	basePlaybook := playbook.Base()
+	return baseInventory, basePlaybook, options, nil
+
 }
