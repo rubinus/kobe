@@ -1,60 +1,45 @@
 package task
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v7"
 	uuid "github.com/satori/go.uuid"
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
 	"kobe/pkg/models"
 	"net/http"
+	"time"
 )
 
-const modelName = "task"
+const (
+	taskQueueKey = "queue"
+)
+
+// @ params args
 
 func Create(ctx *gin.Context) {
-	db := ctx.MustGet("db").(*mgo.Database)
-	var t models.Task
-	if err := ctx.ShouldBind(&t); err != nil {
+	var task models.Task
+	if err := ctx.ShouldBindJSON(&task); err != nil {
 		ctx.JSON(http.StatusBadRequest, err.Error())
-		return
 	}
-	c := db.C(modelName)
-	index := mgo.Index{
-		Key:    []string{"uid"},
-		Unique: true,
-	}
-	_ = c.EnsureIndex(index)
-	t.State = models.TaskStateScheduling
-	t.Success = false
-	t.Scheduled = false
-	t.Uid = uuid.NewV4().String()
-	if err := c.Insert(t); err != nil {
-		ctx.JSON(http.StatusBadRequest, err.Error())
-		return
-	}
-	ctx.JSON(http.StatusCreated, t)
+	r := ctx.MustGet("redis").(*redis.Client)
+	task.Uid = uuid.NewV4().String()
+	task.CreatedTime = time.Now()
+	task.WebSocket = fmt.Sprintf("ws//%s", task.Uid)
+	task.State = models.TaskStatePending
+	r.HSet(task.Uid, task)
+	r.LPush(taskQueueKey, task.Uid)
+	ctx.JSON(http.StatusCreated, task)
 }
 
 func Get(ctx *gin.Context) {
-	db := ctx.MustGet("db").(*mgo.Database)
-	c := db.C(modelName)
-	t := models.Task{}
+	r := ctx.MustGet("redis").(*redis.Client)
 	uid := ctx.Param("uid")
-	query := bson.M{"uid": uid}
-	if err := c.Find(query).One(&t); err != nil {
-		ctx.JSON(http.StatusNotFound, err.Error())
-		return
-	}
-	ctx.JSON(http.StatusOK, t)
+	m := r.HGetAll(uid)
+	ctx.JSON(http.StatusCreated, m)
 }
 
 func List(ctx *gin.Context) {
-	db := ctx.MustGet("db").(*mgo.Database)
-	ps := []models.Task{}
-	err := db.C(modelName).Find(nil).Sort("-created_data").All(&ps)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, err.Error())
-		return
-	}
-	ctx.JSON(http.StatusOK, ps)
+	r := ctx.MustGet("redis").(*redis.Client)
+	ts := r.LRange(taskQueueKey, 0, -1)
+	ctx.JSON(http.StatusCreated, ts)
 }

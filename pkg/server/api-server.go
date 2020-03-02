@@ -6,9 +6,7 @@ import (
 	"kobe/pkg/api/inventory"
 	"kobe/pkg/api/playbook"
 	"kobe/pkg/api/task"
-	"kobe/pkg/api/worker"
-	"kobe/pkg/db"
-	"kobe/pkg/middlewares"
+	"kobe/pkg/connections"
 )
 
 var App *gin.Engine
@@ -18,9 +16,7 @@ func init() {
 }
 
 func Run() error {
-	db.Connect()
-	App.Use(middlewares.Connect)
-	App.Use(middlewares.WorkerManager)
+	connections.ConnectRedis()
 	v1 := App.Group("/api/v1")
 	{
 		p := v1.Group("/playbooks")
@@ -40,10 +36,6 @@ func Run() error {
 			t.GET("/", task.List)
 			t.GET("/:uid", task.Get)
 			t.POST("/", task.Create)
-		}
-		w := v1.Group("/workers")
-		{
-			w.GET("/",worker.List)
 		}
 	}
 	bind := viper.GetString("server.bind")

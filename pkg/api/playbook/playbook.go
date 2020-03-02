@@ -2,35 +2,18 @@ package playbook
 
 import (
 	"github.com/gin-gonic/gin"
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
 	"io/ioutil"
 	"kobe/pkg/logger"
 	"kobe/pkg/models"
 	"net/http"
 	"os"
 	"path"
-	"time"
 )
 
 var log = logger.Logger
 
-const modelName = "playbook"
-
 func List(ctx *gin.Context) {
-	db := ctx.MustGet("db").(*mgo.Database)
-	c := db.C(modelName)
-	index := mgo.Index{
-		Key:    []string{"name"},
-		Unique: true,
-	}
-	_ = c.EnsureIndex(index)
-	if err := lookUp(db); err != nil {
-		ctx.JSON(http.StatusInternalServerError, err.Error())
-		return
-	}
-	ps := []models.Playbook{}
-	err := c.Find(nil).Sort("-created_time").All(&ps)
+	ps, err := lookUp()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err.Error())
 		return
@@ -38,30 +21,41 @@ func List(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, ps)
 }
 
-func lookUp(db *mgo.Database) error {
-	c := db.C(modelName)
+func lookUp() ([]models.PlaybookSet, error) {
 	pwd, _ := os.Getwd()
 	playbookPath := path.Join(pwd, "data", "playbooks")
 	log.Debugf("search playbook in path: %s", playbookPath)
 	if err := os.MkdirAll(playbookPath, 0755); err != nil {
-		return err
+		log.Errorf("can not make playbook dir %s reason %s", playbookPath, err.Error())
+		return nil, err
 	}
 	rd, err := ioutil.ReadDir(playbookPath)
 	if err != nil {
-		return err
+		log.Errorf("can not read playbook dir %s reason %s", playbookPath, err.Error())
+		return nil, err
 	}
+	pss := make([]models.PlaybookSet, 0)
 	for _, r := range rd {
 		if r.IsDir() {
-			p := models.Playbook{
-				Name:        r.Name(),
-				Path:        path.Join(playbookPath, r.Name()),
-				CreatedTime: time.Now(),
+			ps := models.PlaybookSet{
+				Name: r.Name(),
+				Path: path.Join(playbookPath, r.Name()),
 			}
-			if _, err := c.Upsert(bson.M{"name": p.Name}, p); err != nil {
-				return err
+			setPath := path.Join(playbookPath, r.Name())
+			sd, err := ioutil.ReadDir(setPath)
+			if err != nil {
+				log.Errorf("can not read playbookSet dir %s reason %s", setPath, err.Error())
+				continue
 			}
-			log.Debugf("discover playbook %s in path %s", p.Name, p.Path)
+			pbs := make([]models.Playbook, 0)
+			for _, s := range sd {
+				if !s.IsDir() {
+					p := models.Playbook{Name: s.Name()}
+					pbs = append(pbs, p)
+				}
+			}
+			pss = append(pss, ps)
 		}
 	}
-	return nil
+	return pss, nil
 }

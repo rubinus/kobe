@@ -2,13 +2,10 @@ package ansible
 
 import (
 	"fmt"
-	"gopkg.in/mgo.v2/bson"
-	"kobe/pkg/db"
 	"kobe/pkg/logger"
 	"kobe/pkg/models"
 	"os"
 	"os/exec"
-	"path"
 	"time"
 )
 
@@ -60,9 +57,8 @@ func (pr *PlaybookRunner) Run(args map[string]interface{}, workPath string, stdo
 	cmd.Stdout = stdout
 	cmd.Stderr = stdout
 
-	start := time.Now()
 	result := models.Result{
-		StartTime: &start,
+		StartTime: time.Now(),
 		ExitCode:  0,
 		Message:   "",
 	}
@@ -71,27 +67,17 @@ func (pr *PlaybookRunner) Run(args map[string]interface{}, workPath string, stdo
 		result.Finished = false
 		return &result, nil
 	}
-	end := time.Now()
 	result.Finished = true
-	result.EndTime = &end
+	result.EndTime = time.Now()
 	result.ExitCode = cmd.ProcessState.ExitCode()
 	return &result, nil
 }
-func handleArgs(args map[string]interface{}) (*BaseInventory, *BasePlaybook, map[string]string, error) {
-	session := db.Session.Clone()
-	d := session.DB(db.Mongo.Database)
+func handleArgs(args map[string]interface{}) (*BaseInventory, *BasePlaybook,
+	map[string]string, error) {
 	inventoryName := args["inventory"]
 	playbookName := args["playbook"]
 	var inventory models.Inventory
 	var playbook models.Playbook
-	if err := d.C("inventory").Find(bson.M{"name": inventoryName}).One(&inventory); err != nil {
-		log.Errorf("can not find inventory %s reason %s", inventoryName, err)
-		return nil, nil, nil, err
-	}
-	if err := d.C("playbook").Find(bson.M{"name": playbookName}).One(&playbook); err != nil {
-		log.Errorf("can not find playbook %s reason %s", inventoryName, err)
-		return nil, nil, nil, err
-	}
 	options := map[string]string{}
 	_, ok := args["options"]
 	if ok {

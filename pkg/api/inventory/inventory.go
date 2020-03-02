@@ -11,19 +11,8 @@ import (
 const modelName = "inventory"
 
 func Create(ctx *gin.Context) {
-	db := ctx.MustGet("db").(*mgo.Database)
 	var i models.Inventory
 	if err := ctx.ShouldBind(&i); err != nil {
-		ctx.JSON(http.StatusBadRequest, err.Error())
-		return
-	}
-	c := db.C(modelName)
-	index := mgo.Index{
-		Key:    []string{"name"},
-		Unique: true,
-	}
-	_ = c.EnsureIndex(index)
-	if err := c.Insert(i); err != nil {
 		ctx.JSON(http.StatusBadRequest, err.Error())
 		return
 	}

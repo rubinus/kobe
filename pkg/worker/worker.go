@@ -1,58 +1,38 @@
-package container
+package worker
 
 import (
+	"encoding/json"
 	"fmt"
-	uuid "github.com/satori/go.uuid"
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
-	"io/ioutil"
-	"kobe/pkg/db"
+	"kobe/pkg/connections"
 	"kobe/pkg/logger"
 	"kobe/pkg/models"
 	"os"
-	"path"
 	"time"
 )
 
 var log = logger.Logger
 
-type Container struct {
-	worker      *models.Worker
-	Db          *mgo.Database
+type Worker struct {
 	CurrentTask *models.Task
 }
 
-func (w *Container) Listen() {
-	uid, err := readOrCreateWorkerUId()
-	if err != nil {
-		log.Fatalf("can not get worker Uid:  %s", err)
-	}
-	w.worker.Uid = uid
-	if err := w.save(); err != nil {
-		log.Fatalf("can not start worker: %s", err)
-	}
-	log.Infof("worker: %s started ", w.worker.Uid)
-	go w.SendHealth()
+const (
+	taskQueueKey = "queue"
+)
+
+func (w *Worker) Listen() {
+	log.Infof("worker: %s started ")
 	for {
 		log.Info("waiting for task...")
-		time.Sleep(5 * time.Second)
-		c := w.Db.C("task")
 		var task models.Task
-		if err := c.Find(bson.M{"state": models.TaskStateScheduling}).Sort("-created_time").One(&task); err != nil {
-			if err == mgo.ErrNotFound {
-				log.Info("no task in queue")
-			} else {
-				log.Error(err.Error())
-			}
+		taskUid := connections.Redis.BRPop(-1, taskQueueKey).String()
+		log.Infof("received a task :%s", task.Uid)
+		taskJson := connections.Redis.HGetAll(taskUid).String()
+		if err := json.Unmarshal([]byte(taskJson), &task); err != nil {
+			log.Errorf("invalid message, can not parse json to task reason", err)
 			continue
 		}
-		if err := w.schedule(&task); err != nil {
-			log.Error(err.Error())
-			continue
-		}
-		if err := w.work(); err != nil {
-			log.Error(err.Error())
-		}
+		w.CurrentTask = &task
 	}
 }
 
@@ -60,110 +40,23 @@ type Runnable interface {
 	Run(args map[string]interface{}, workPath string, stdout *os.File) (models.Result, error)
 }
 
-func (w *Container) work() error {
+func (w *Worker) work()  {
 	w.CurrentTask.State = models.TaskStateRunning
-	_ = w.saveTask()
-
+	w.saveTask()
 	// runner 所需要参数  playbook inventory args workPath logfile
-
 	time.Sleep(10 * time.Second)
 	fmt.Println("handle task success")
 	w.CurrentTask.State = models.TaskStateFinished
-	return w.saveTask()
 }
 
-func (w *Container) schedule(task *models.Task) error {
-	w.CurrentTask = task
-	w.CurrentTask.Scheduled = true
-	w.CurrentTask.ScheduleTime = time.Now()
-	w.CurrentTask.Worker = w.worker.Uid
-	w.CurrentTask.State = models.TaskStatePending
-	return w.saveTask()
-}
-
-func (w *Container) saveTask() error {
-	c := w.Db.C("task")
-	w.CurrentTask.Id = ""
-	if err := c.Update(bson.M{"uid": w.CurrentTask.Uid}, &w.CurrentTask); err != nil {
-		return err
-	}
-	return nil
-}
-
-func readOrCreateWorkerUId() (string, error) {
-	pwd, _ := os.Getwd()
-	idPath := path.Join(pwd, "data", "worker", "uid")
-	if _, err := os.Stat(idPath); err != nil {
-		if os.IsPermission(err) {
-			return "", err
-		}
-		if !os.IsExist(err) {
-			uid := uuid.NewV4().String()
-			if err := writeWorkerUid(uid); err != nil {
-				return "", err
-			}
-			return uid, nil
-		}
-	}
-	file, err := os.OpenFile(idPath, os.O_RDONLY, 0755)
-	if err != nil {
-		return "", err
-	}
-	bs, err := ioutil.ReadAll(file)
-	if err != nil {
-		return "", err
-	}
-	if string(bs) == "" {
-		uid := uuid.NewV4().String()
-		if err := writeWorkerUid(uid); err != nil {
-			return "", err
-		}
-		return uid, nil
-	}
-	return string(bs), nil
-}
-
-func writeWorkerUid(uid string) error {
-	pwd, _ := os.Getwd()
-	workerPath := path.Join(pwd, "data", "worker")
-	idPath := path.Join(workerPath, "uid")
-	if err := os.MkdirAll(workerPath, 0754); err != nil {
-		return err
-	}
-	if err := ioutil.WriteFile(idPath, []byte(uid), 0755); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (w *Container) SendHealth() {
-	for {
-		time.Sleep(5 * time.Second)
-		w.worker.State = models.StateWorkerOnline
-		w.worker.LastHealthCheckTime = time.Now()
-		if err := w.save(); err != nil {
-			log.Warnf("can not send health: %s", err)
-		}
-	}
-}
-
-func (w *Container) save() error {
-	if _, err := w.Db.C("worker").Upsert(bson.M{"uid": w.worker.Uid}, w.worker); err != nil {
-		return err
-	}
-	return nil
+func (w *Worker) saveTask() {
+	connections.Redis.HSet(w.CurrentTask.Uid, w.CurrentTask)
 }
 
 func Run() {
-	db.Connect()
-	s := db.Session.Clone()
-	defer s.Close()
-	d := s.DB(db.Mongo.Database)
-	c := Container{
-		worker: &models.Worker{
-			State: models.StateWorkerOnline,
-		},
-		Db:          d,
+	connections.ConnectRedis()
+	defer connections.Redis.Close()
+	c := Worker{
 		CurrentTask: nil,
 	}
 	c.Listen()
