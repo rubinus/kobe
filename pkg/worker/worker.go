@@ -1,12 +1,13 @@
 package worker
 
 import (
-	"encoding/json"
 	"fmt"
+	"kobe/pkg/ansible"
 	"kobe/pkg/connections"
 	"kobe/pkg/logger"
 	"kobe/pkg/models"
 	"os"
+	"path"
 	"time"
 )
 
@@ -24,28 +25,35 @@ func (w *Worker) Listen() {
 	log.Infof("worker: %s started ")
 	for {
 		log.Info("waiting for task...")
-		var task models.Task
-		taskUid := connections.Redis.BRPop(-1, taskQueueKey).String()
-		log.Infof("received a task :%s", task.Uid)
-		taskJson := connections.Redis.HGetAll(taskUid).String()
-		if err := json.Unmarshal([]byte(taskJson), &task); err != nil {
-			log.Errorf("invalid message, can not parse json to task reason", err)
-			continue
-		}
-		w.CurrentTask = &task
+		//var task models.Task
+		taskUid := connections.Redis.BRPop(0, taskQueueKey).Val()[1]
+		log.Infof("received a task :%s", taskUid)
+		taskJson := connections.Redis.HGetAll(taskUid)
+		log.Debugf("taskInfo:", taskJson.String())
+		//if err := json.Unmarshal([]byte(taskJson), &task); err != nil {
+		//	log.Errorf("invalid message, can not parse json to task reason:", err.Error())
+		//	continue
+		//}
+		//w.CurrentTask = &task
 	}
 }
 
-type Runnable interface {
-	Run(args map[string]interface{}, workPath string, stdout *os.File) (models.Result, error)
-}
-
-func (w *Worker) work()  {
+func (w *Worker) work() {
 	w.CurrentTask.State = models.TaskStateRunning
 	w.saveTask()
-	// runner 所需要参数  playbook inventory args workPath logfile
-	time.Sleep(10 * time.Second)
-	fmt.Println("handle task success")
+	result := models.Result{
+		StartTime: time.Now(),
+	}
+	pwd, _ := os.Getwd()
+	workPath := fmt.Sprintf(path.Join(pwd, w.CurrentTask.Uid))
+	logFile, _ := os.Create(fmt.Sprintf("%s.log", path.Join(workPath, "log", w.CurrentTask.Uid)))
+	_ = os.MkdirAll(workPath, 0755)
+	runner := ansible.PlaybookRunner{
+		Inventory: w.CurrentTask.Args["inventory"].(string),
+		Playbook:  w.CurrentTask.Args["playbook"].(string),
+	}
+	runner.Run(workPath, logFile, &result)
+
 	w.CurrentTask.State = models.TaskStateFinished
 }
 

@@ -3,6 +3,8 @@ module kobe
 go 1.13
 
 require (
+	github.com/apenella/go-ansible v0.3.1
+	github.com/apenella/go-common-utils v0.1.1 // indirect
 	github.com/apex/log v1.1.2
 	github.com/chenhg5/collection v0.0.0-20191118032303-cb21bccce4c3
 	github.com/fatih/color v1.7.0
@@ -10,7 +12,7 @@ require (
 	github.com/go-openapi/spec v0.19.6 // indirect
 	github.com/go-openapi/swag v0.19.7 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect
-	github.com/go-redis/redis/v7 v7.2.0 // indirect
+	github.com/go-redis/redis/v7 v7.2.0
 	github.com/golang/protobuf v1.3.4 // indirect
 	github.com/json-iterator/go v1.1.9 // indirect
 	github.com/leodido/go-urn v1.2.0 // indirect
@@ -35,5 +37,6 @@ require (
 	golang.org/x/tools v0.0.0-20200226224502-204d844ad48d // indirect
 	gopkg.in/go-playground/validator.v9 v9.31.0 // indirect
 	gopkg.in/ini.v1 v1.52.0 // indirect
+	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 )

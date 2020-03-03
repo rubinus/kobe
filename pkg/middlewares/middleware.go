@@ -8,9 +8,8 @@ import (
 
 var log = logger.Logger
 
-func Connect(c *gin.Context) {
+func SetRedis(c *gin.Context) {
 	s := connections.Redis
-	defer s.Close()
 	c.Set("redis", s)
 	c.Next()
 }

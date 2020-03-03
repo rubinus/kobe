@@ -7,6 +7,7 @@ import (
 	"kobe/pkg/api/playbook"
 	"kobe/pkg/api/task"
 	"kobe/pkg/connections"
+	"kobe/pkg/middlewares"
 )
 
 var App *gin.Engine
@@ -17,9 +18,10 @@ func init() {
 
 func Run() error {
 	connections.ConnectRedis()
+	App.Use(middlewares.SetRedis)
 	v1 := App.Group("/api/v1")
 	{
-		p := v1.Group("/playbooks")
+		p := v1.Group("/sets")
 		{
 			p.GET("/", playbook.List)
 		}

@@ -21,7 +21,7 @@ func List(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, ps)
 }
 
-func lookUp() ([]models.PlaybookSet, error) {
+func lookUp() ([]models.Playbook, error) {
 	pwd, _ := os.Getwd()
 	playbookPath := path.Join(pwd, "data", "playbooks")
 	log.Debugf("search playbook in path: %s", playbookPath)
@@ -34,28 +34,14 @@ func lookUp() ([]models.PlaybookSet, error) {
 		log.Errorf("can not read playbook dir %s reason %s", playbookPath, err.Error())
 		return nil, err
 	}
-	pss := make([]models.PlaybookSet, 0)
+	ps := make([]models.Playbook, 0)
 	for _, r := range rd {
-		if r.IsDir() {
-			ps := models.PlaybookSet{
+		if !r.IsDir() {
+			p := models.Playbook{
 				Name: r.Name(),
-				Path: path.Join(playbookPath, r.Name()),
 			}
-			setPath := path.Join(playbookPath, r.Name())
-			sd, err := ioutil.ReadDir(setPath)
-			if err != nil {
-				log.Errorf("can not read playbookSet dir %s reason %s", setPath, err.Error())
-				continue
-			}
-			pbs := make([]models.Playbook, 0)
-			for _, s := range sd {
-				if !s.IsDir() {
-					p := models.Playbook{Name: s.Name()}
-					pbs = append(pbs, p)
-				}
-			}
-			pss = append(pss, ps)
+			ps = append(ps, p)
 		}
 	}
-	return pss, nil
+	return ps, nil
 }

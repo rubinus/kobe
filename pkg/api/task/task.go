@@ -24,10 +24,17 @@ func Create(ctx *gin.Context) {
 	r := ctx.MustGet("redis").(*redis.Client)
 	task.Uid = uuid.NewV4().String()
 	task.CreatedTime = time.Now()
-	task.WebSocket = fmt.Sprintf("ws//%s", task.Uid)
 	task.State = models.TaskStatePending
-	r.HSet(task.Uid, task)
-	r.LPush(taskQueueKey, task.Uid)
+	if _, err := r.HSet(task.Uid, task).Result(); err != nil {
+		b, _ := task.MarshalBinary()
+		fmt.Println(string(b))
+		ctx.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+	if _, err := r.LPush(taskQueueKey, task.Uid).Result(); err != nil {
+		ctx.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
 	ctx.JSON(http.StatusCreated, task)
 }
 
