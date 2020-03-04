@@ -3,6 +3,7 @@ module kobe
 go 1.13
 
 require (
+	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/apenella/go-ansible v0.3.1
 	github.com/apenella/go-common-utils v0.1.1 // indirect
 	github.com/apex/log v1.1.2
@@ -30,11 +31,12 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.6.2
-	github.com/swaggo/swag v1.6.5 // indirect
+	github.com/swaggo/gin-swagger v1.2.0
+	github.com/swaggo/swag v1.6.5
 	github.com/urfave/cli/v2 v2.1.1 // indirect
-	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b // indirect
-	golang.org/x/sys v0.0.0-20200301040627-c5d0d7b4ec88 // indirect
-	golang.org/x/tools v0.0.0-20200226224502-204d844ad48d // indirect
+	golang.org/x/net v0.0.0-20200301022130-244492dfa37a // indirect
+	golang.org/x/sys v0.0.0-20200302150141-5c8b2ff67527 // indirect
+	golang.org/x/tools v0.0.0-20200304024140-c4206d458c3f // indirect
 	gopkg.in/go-playground/validator.v9 v9.31.0 // indirect
 	gopkg.in/ini.v1 v1.52.0 // indirect
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22

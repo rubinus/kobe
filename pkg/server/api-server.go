@@ -3,48 +3,19 @@ package server
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
-	"kobe/pkg/api/inventory"
-	"kobe/pkg/api/playbook"
-	"kobe/pkg/api/result"
-	"kobe/pkg/api/task"
+	"github.com/swaggo/gin-swagger"
+	"github.com/swaggo/gin-swagger/swaggerFiles"
 	"kobe/pkg/connections"
 	"kobe/pkg/middlewares"
+	"kobe/pkg/routers"
 )
-
-var App *gin.Engine
-
-func init() {
-	App = gin.Default()
-}
 
 func Run() error {
 	connections.ConnectRedis()
-	App.Use(middlewares.SetRedis)
-	v1 := App.Group("/api/v1")
-	{
-		p := v1.Group("/playbooks")
-		{
-			p.GET("/", playbook.List)
-		}
-		i := v1.Group("/inventory")
-		{
-			i.GET("/", inventory.List)
-			i.POST("/", inventory.Create)
-			i.PUT("/:name", inventory.Update)
-			i.GET("/:name", inventory.Get)
-			i.DELETE("/:name", inventory.Delete)
-		}
-		t := v1.Group("tasks")
-		{
-			t.GET("/", task.List)
-			t.GET("/:uid", task.Get)
-			t.POST("/", task.Create)
-		}
-		r := v1.Group("result")
-		{
-			r.GET("/:uid", result.Get)
-		}
-	}
+	app := gin.Default()
+	app.Use(middlewares.SetRedis)
+	app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	routers.InitRouter(app)
 	bind := viper.GetString("server.bind")
-	return App.Run(bind)
+	return app.Run(bind)
 }

@@ -4,10 +4,8 @@ import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v7"
-	uuid "github.com/satori/go.uuid"
 	"kobe/pkg/models"
 	"net/http"
-	"time"
 )
 
 const (
@@ -15,26 +13,12 @@ const (
 	taskSetKey   = "task"
 )
 
-func Create(ctx *gin.Context) {
-	var task models.Task
-	if err := ctx.ShouldBindJSON(&task); err != nil {
-		ctx.JSON(http.StatusBadRequest, err.Error())
-	}
-	r := ctx.MustGet("redis").(*redis.Client)
-	task.Uid = uuid.NewV4().String()
-	task.CreatedTime = time.Now()
-	task.State = models.TaskStatePending
-	if _, err := r.HSet(taskSetKey, task.Uid, task).Result(); err != nil {
-		ctx.JSON(http.StatusInternalServerError, err.Error())
-		return
-	}
-	if _, err := r.LPush(taskQueueKey, task.Uid).Result(); err != nil {
-		ctx.JSON(http.StatusInternalServerError, err.Error())
-		return
-	}
-	ctx.JSON(http.StatusCreated, task)
-}
-
+// @Summary Get Task Info
+// @Description Get task info
+// @Param uid path string true "task_uid"
+// @Produce json
+// @Success 201 {object} models.Task
+// @Router /tasks/{uid} [get]
 func Get(ctx *gin.Context) {
 	r := ctx.MustGet("redis").(*redis.Client)
 	uid := ctx.Param("uid")
@@ -51,6 +35,11 @@ func Get(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, task)
 }
 
+// @Summary List Task Info
+// @Description List task info
+// @Produce json
+// @Success 200 {object} models.Task
+// @Router /tasks/ [get]
 func List(ctx *gin.Context) {
 	r := ctx.MustGet("redis").(*redis.Client)
 	ts, err := r.HGetAll(taskSetKey).Result()
@@ -58,5 +47,11 @@ func List(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	ctx.JSON(http.StatusOK, ts)
+	tasks := []models.Task{}
+	for k, _ := range ts {
+		var task models.Task
+		_ = json.Unmarshal([]byte(ts[k]), &task)
+		tasks = append(tasks, task)
+	}
+	ctx.JSON(http.StatusOK, tasks)
 }

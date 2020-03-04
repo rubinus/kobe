@@ -12,6 +12,11 @@ import (
 
 var log = logger.Logger
 
+// @Summary List playbooks
+// @Description List all playbooks
+// @Produce  json
+// @Success 200 {array} models.Playbook
+// @Router /playbooks/ [get]
 func List(ctx *gin.Context) {
 	ps, err := lookUp()
 	if err != nil {

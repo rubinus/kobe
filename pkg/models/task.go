@@ -11,12 +11,17 @@ const (
 	TaskStatePending  = "pending"
 )
 
+type TaskRequest struct {
+	Args map[string]string `json:"args"`
+}
+
 type Task struct {
-	Uid         string                 `json:"uid" bson:"uid"`
-	State       string                 `json:"state" bson:"state"`
-	CreatedTime time.Time              `json:"created_time"`
-	Args        map[string]interface{} `json:"args"`
-	Finished    bool                   `json:"finished"`
+	Uid         string            `json:"uid" bson:"uid"`
+	State       string            `json:"state" bson:"state"`
+	CreatedTime time.Time         `json:"created_time"`
+	Args        map[string]string `json:"args"`
+	Finished    bool              `json:"finished"`
+	Type        string            `json:"type"`
 }
 
 func (t Task) MarshalBinary() (data []byte, err error) {

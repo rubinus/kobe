@@ -1,0 +1,259 @@
+basePath: /api/v1/
+definitions:
+  models.Inventory:
+    properties:
+      content:
+        type: string
+      name:
+        type: string
+    type: object
+  models.Playbook:
+    properties:
+      name:
+        type: string
+    type: object
+  models.Result:
+    properties:
+      end_time:
+        type: string
+      logfile:
+        type: string
+      message:
+        type: string
+      start_time:
+        type: string
+      stdout:
+        type: string
+      success:
+        type: boolean
+    type: object
+  models.RunAdhocRequest:
+    properties:
+      arg:
+        type: string
+      host:
+        type: string
+      inventory:
+        type: string
+      module:
+        type: string
+    type: object
+  models.RunPlaybookRequest:
+    properties:
+      inventory:
+        type: string
+      playbook:
+        type: string
+    type: object
+  models.Task:
+    properties:
+      args:
+        additionalProperties:
+          type: string
+        type: object
+      created_time:
+        type: string
+      finished:
+        type: boolean
+      state:
+        type: string
+      type:
+        type: string
+      uid:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: This is RestAPI Client for ansible
+  license: {}
+  title: Kobe Restful API
+  version: 0.0.1
+paths:
+  /inventory/:
+    get:
+      description: List Inventory
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Inventory'
+            type: array
+      summary: List Inventory
+    post:
+      consumes:
+      - application/json
+      description: Create Inventory
+      parameters:
+      - description: create inventory
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.Inventory'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Inventory'
+      summary: Create Inventory
+  /inventory/{name}:
+    delete:
+      description: Delete Inventory
+      parameters:
+      - description: name
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: name
+          schema:
+            type: string
+      summary: Delete Inventory
+    get:
+      description: Get Inventory
+      parameters:
+      - description: name
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Inventory'
+      summary: Get Inventory
+    put:
+      consumes:
+      - application/json
+      description: Update Inventory
+      parameters:
+      - description: update inventory
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.Inventory'
+      - description: name
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/models.Inventory'
+      summary: Update Inventory
+  /playbooks/:
+    get:
+      description: List all playbooks
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Playbook'
+            type: array
+      summary: List playbooks
+  /result/{uid}:
+    get:
+      description: Get task result by task id when task finished
+      parameters:
+      - description: task_uid
+        in: path
+        name: uid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Result'
+      summary: Get Task Result
+  /tasks/:
+    get:
+      description: List task info
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Task'
+      summary: List Task Info
+  /tasks/{uid}:
+    get:
+      description: Get task info
+      parameters:
+      - description: task_uid
+        in: path
+        name: uid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Task'
+      summary: Get Task Info
+  /tasks/adhoc/:
+    post:
+      consumes:
+      - application/json
+      description: Create Run Adhoc Task
+      parameters:
+      - description: create adhoc task
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.RunAdhocRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Task'
+      summary: RunAdhoc
+  /tasks/playbook/:
+    post:
+      consumes:
+      - application/json
+      description: Create Run Playbook Task
+      parameters:
+      - description: create playbook task
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.RunPlaybookRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Task'
+      summary: RunPlaybook
+swagger: "2.0"

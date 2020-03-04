@@ -2,6 +2,7 @@ package worker
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"kobe/pkg/ansible"
 	"kobe/pkg/connections"
@@ -41,7 +42,10 @@ func (w *Worker) Listen() {
 			continue
 		}
 		w.CurrentTask = &task
-		w.work()
+		if err := w.work(); err != nil {
+			log.Errorf("run task error reason %s", err)
+			continue
+		}
 	}
 }
 
@@ -53,7 +57,7 @@ func (w *Worker) work() error {
 		log.Errorf("can not work dir %s reason %s", workPath, err.Error())
 		return err
 	}
-	logPath := fmt.Sprintf("%s.log", path.Join(workPath, w.CurrentTask.Uid))
+	logPath := fmt.Sprintf("%s.log", path.Join(workPath, "run"))
 	logFile, err := os.Create(logPath)
 	if err := w.saveTask(); err != nil {
 		log.Errorf("can not save task reason: %s", err.Error())
@@ -66,12 +70,18 @@ func (w *Worker) work() error {
 	if err != nil {
 		log.Errorf("can not create log file reason %s", err.Error())
 	}
-	runner := ansible.PlaybookRunner{
-		Inventory: w.CurrentTask.Args["inventory"].(string),
-		Playbook:  w.CurrentTask.Args["playbook"].(string),
+	var runner Runnable
+	switch w.CurrentTask.Type {
+	case "adhoc":
+		runner = &ansible.AdhocRunner{}
+	case "playbook":
+		runner = &ansible.PlaybookRunner{}
+	default:
+		return errors.New(fmt.Sprintf("can not execute task type %s", w.CurrentTask.Type))
 	}
-	runner.Run(workPath, logFile, &result)
+	runner.Run(w.CurrentTask.Args, workPath, logFile, &result)
 	w.CurrentTask.State = models.TaskStateFinished
+	w.CurrentTask.Finished = true
 	if err := w.saveTask(); err != nil {
 		log.Errorf("can not save task reason: %s", err.Error())
 		return err

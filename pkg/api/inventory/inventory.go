@@ -14,6 +14,13 @@ import (
 
 var log = logger.Logger
 
+// @Summary Create Inventory
+// @Description Create Inventory
+// @Accept  json
+// @Param data body models.Inventory  true "create inventory"
+// @Produce json
+// @Success 201 {object} models.Inventory
+// @Router /inventory/ [post]
 func Create(ctx *gin.Context) {
 	var i models.Inventory
 	if err := ctx.ShouldBind(&i); err != nil {
@@ -37,6 +44,14 @@ func Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, i)
 }
 
+// @Summary Update Inventory
+// @Description Update Inventory
+// @Accept  json
+// @Param data body models.Inventory  true "update inventory"
+// @Param name path string true "name"
+// @Produce json
+// @Success 202 {object} models.Inventory
+// @Router /inventory/{name} [put]
 func Update(ctx *gin.Context) {
 	var i models.Inventory
 	if err := ctx.ShouldBind(&i); err != nil {
@@ -57,8 +72,14 @@ func Update(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusCreated, i)
+	ctx.JSON(http.StatusAccepted, i)
 }
+
+// @Summary List Inventory
+// @Description List Inventory
+// @Produce json
+// @Success 200 {array} models.Inventory
+// @Router /inventory/ [get]
 func List(ctx *gin.Context) {
 	is, err := lookUp()
 	if err != nil {
@@ -68,6 +89,12 @@ func List(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, is)
 }
 
+// @Summary Get Inventory
+// @Description Get Inventory
+// @Produce json
+// @Param name path string true "name"
+// @Success 200 {object} models.Inventory
+// @Router /inventory/{name} [get]
 func Get(ctx *gin.Context) {
 	name := ctx.Param("name")
 	i, err := GetModel(name)
@@ -78,6 +105,12 @@ func Get(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, i)
 }
 
+// @Summary Delete Inventory
+// @Description Delete Inventory
+// @Produce json
+// @Param name path string true "name"
+// @Success 200 {string} string "name"
+// @Router /inventory/{name} [delete]
 func Delete(ctx *gin.Context) {
 	name := ctx.Param("name")
 	e, err := exists(name)

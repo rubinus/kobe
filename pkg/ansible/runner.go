@@ -1,7 +1,6 @@
 package ansible
 
 import (
-	"fmt"
 	ansibler "github.com/apenella/go-ansible"
 	"github.com/apex/log"
 	"kobe/pkg/models"
@@ -10,16 +9,40 @@ import (
 	"time"
 )
 
-type PlaybookRunner struct {
-	Inventory string
-	Playbook  string
-	Options   map[string]interface{}
+type AdhocRunner struct{}
+
+func (a *AdhocRunner) Run(args map[string]string, workPath string, logFile *os.File, result *models.Result) {
+	pwd, _ := os.Getwd()
+	if err := os.Chdir(workPath); err != nil {
+		log.Errorf("can not chdir %s reason %s", workPath, err.Error())
+	}
+	defer os.Chdir(pwd)
+	executer := AnsibleExecuter{
+		Write: logFile,
+	}
+	inventoryPath := path.Join(pwd, "data", "inventory", args["inventory"])
+
+	as := []string{
+		"-i", inventoryPath, args["pattern"],
+		"-m", args["module"],
+		"-a", args["arg"],
+	}
+	if err := executer.Execute("ansible", as, ""); err != nil {
+		result.Success = false
+		result.Message = err.Error()
+		log.Error(err.Error())
+	} else {
+		result.Success = true
+	}
+
 }
 
-func (p *PlaybookRunner) Run(workPath string, logFile *os.File, result *models.Result) {
+type PlaybookRunner struct{}
+
+func (p *PlaybookRunner) Run(args map[string]string, workPath string, logFile *os.File, result *models.Result) {
 	pwd, _ := os.Getwd()
-	inventoryPath := path.Join(pwd, "data", "inventory", p.Inventory)
-	playbookPath := path.Join(pwd, "data", "playbooks", fmt.Sprintf("%s.yml", p.Playbook))
+	inventoryPath := path.Join(pwd, "data", "inventory", args["inventory"])
+	playbookPath := path.Join(pwd, "data", "playbooks", args["playbook"])
 	if err := os.Chdir(workPath); err != nil {
 		log.Errorf("can not chdir %s reason %s", workPath, err.Error())
 	}
@@ -30,7 +53,9 @@ func (p *PlaybookRunner) Run(workPath string, logFile *os.File, result *models.R
 		Options: &ansibler.AnsiblePlaybookOptions{
 			Inventory: inventoryPath,
 		},
-		Writer: logFile,
+		Exec: &AnsibleExecuter{
+			Write: logFile,
+		},
 	}
 	if err := pb.Run(); err != nil {
 		result.Success = false

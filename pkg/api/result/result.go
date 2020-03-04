@@ -12,6 +12,12 @@ const (
 	resultKey = "result"
 )
 
+// @Summary Get Task Result
+// @Description Get task result by task id when task finished
+// @Param uid path string true "task_uid"
+// @Produce json
+// @Success 201 {object} models.Result
+// @Router /result/{uid} [get]
 func Get(ctx *gin.Context) {
 	r := ctx.MustGet("redis").(*redis.Client)
 	uid := ctx.Param("uid")
