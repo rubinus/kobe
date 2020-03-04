@@ -1,7 +1,9 @@
 package ansible
 
 import (
+	"fmt"
 	ansibler "github.com/apenella/go-ansible"
+	"github.com/apex/log"
 	"kobe/pkg/models"
 	"os"
 	"path"
@@ -17,8 +19,10 @@ type PlaybookRunner struct {
 func (p *PlaybookRunner) Run(workPath string, logFile *os.File, result *models.Result) {
 	pwd, _ := os.Getwd()
 	inventoryPath := path.Join(pwd, "data", "inventory", p.Inventory)
-	playbookPath := path.Join(pwd, "data", "playbook", p.Playbook)
-	_ = os.Chdir(workPath)
+	playbookPath := path.Join(pwd, "data", "playbooks", fmt.Sprintf("%s.yml", p.Playbook))
+	if err := os.Chdir(workPath); err != nil {
+		log.Errorf("can not chdir %s reason %s", workPath, err.Error())
+	}
 	defer os.Chdir(pwd)
 	pb := &ansibler.AnsiblePlaybookCmd{
 		Playbook:   playbookPath,
@@ -31,6 +35,7 @@ func (p *PlaybookRunner) Run(workPath string, logFile *os.File, result *models.R
 	if err := pb.Run(); err != nil {
 		result.Success = false
 		result.Message = err.Error()
+		log.Error(err.Error())
 	} else {
 		result.Success = true
 	}

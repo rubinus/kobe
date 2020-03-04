@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/viper"
 	"kobe/pkg/api/inventory"
 	"kobe/pkg/api/playbook"
+	"kobe/pkg/api/result"
 	"kobe/pkg/api/task"
 	"kobe/pkg/connections"
 	"kobe/pkg/middlewares"
@@ -21,7 +22,7 @@ func Run() error {
 	App.Use(middlewares.SetRedis)
 	v1 := App.Group("/api/v1")
 	{
-		p := v1.Group("/sets")
+		p := v1.Group("/playbooks")
 		{
 			p.GET("/", playbook.List)
 		}
@@ -38,6 +39,10 @@ func Run() error {
 			t.GET("/", task.List)
 			t.GET("/:uid", task.Get)
 			t.POST("/", task.Create)
+		}
+		r := v1.Group("result")
+		{
+			r.GET("/:uid", result.Get)
 		}
 	}
 	bind := viper.GetString("server.bind")

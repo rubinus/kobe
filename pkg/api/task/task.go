@@ -1,7 +1,7 @@
 package task
 
 import (
-	"fmt"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v7"
 	uuid "github.com/satori/go.uuid"
@@ -12,9 +12,8 @@ import (
 
 const (
 	taskQueueKey = "queue"
+	taskSetKey   = "task"
 )
-
-// @ params args
 
 func Create(ctx *gin.Context) {
 	var task models.Task
@@ -25,9 +24,7 @@ func Create(ctx *gin.Context) {
 	task.Uid = uuid.NewV4().String()
 	task.CreatedTime = time.Now()
 	task.State = models.TaskStatePending
-	if _, err := r.HSet(task.Uid, task).Result(); err != nil {
-		b, _ := task.MarshalBinary()
-		fmt.Println(string(b))
+	if _, err := r.HSet(taskSetKey, task.Uid, task).Result(); err != nil {
 		ctx.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -41,12 +38,25 @@ func Create(ctx *gin.Context) {
 func Get(ctx *gin.Context) {
 	r := ctx.MustGet("redis").(*redis.Client)
 	uid := ctx.Param("uid")
-	m := r.HGetAll(uid)
-	ctx.JSON(http.StatusCreated, m)
+	t, err := r.HGet(taskSetKey, uid).Result()
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	var task models.Task
+	if err := json.Unmarshal([]byte(t), &task); err != nil {
+		ctx.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+	ctx.JSON(http.StatusOK, task)
 }
 
 func List(ctx *gin.Context) {
 	r := ctx.MustGet("redis").(*redis.Client)
-	ts := r.LRange(taskQueueKey, 0, -1)
-	ctx.JSON(http.StatusCreated, ts)
+	ts, err := r.HGetAll(taskSetKey).Result()
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	ctx.JSON(http.StatusOK, ts)
 }
