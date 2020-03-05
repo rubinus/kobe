@@ -16,6 +16,7 @@ const (
 // @Description Get task result by task id when task finished
 // @Param uid path string true "task_uid"
 // @Produce json
+// @Tags result
 // @Success 201 {object} models.Result
 // @Router /result/{uid} [get]
 func Get(ctx *gin.Context) {

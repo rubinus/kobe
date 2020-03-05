@@ -5,14 +5,14 @@ type CommonRunRequest struct {
 }
 
 type RunPlaybookRequest struct {
+	Dir      string `json:"dir"`
 	Playbook string `json:"playbook"`
 	CommonRunRequest
 }
 
 type RunAdhocRequest struct {
-	Pattern   string `json:"pattern"`
-	Module string `json:"module"`
-	Arg    string `json:"arg"`
+	Pattern string `json:"pattern"`
+	Module  string `json:"module"`
+	Arg     string `json:"arg"`
 	CommonRunRequest
 }
-

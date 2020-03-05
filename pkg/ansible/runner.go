@@ -42,7 +42,7 @@ type PlaybookRunner struct{}
 func (p *PlaybookRunner) Run(args map[string]string, workPath string, logFile *os.File, result *models.Result) {
 	pwd, _ := os.Getwd()
 	inventoryPath := path.Join(pwd, "data", "inventory", args["inventory"])
-	playbookPath := path.Join(pwd, "data", "playbooks", args["playbook"])
+	playbookPath := path.Join(pwd, "data", "playbooks", args["dir"], args["playbook"])
 	if err := os.Chdir(workPath); err != nil {
 		log.Errorf("can not chdir %s reason %s", workPath, err.Error())
 	}

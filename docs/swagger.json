@@ -15,6 +15,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "inventory"
+                ],
                 "summary": "List Inventory",
                 "responses": {
                     "200": {
@@ -35,6 +38,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "inventory"
                 ],
                 "summary": "Create Inventory",
                 "parameters": [
@@ -64,6 +70,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "inventory"
+                ],
                 "summary": "Get Inventory",
                 "parameters": [
                     {
@@ -90,6 +99,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "inventory"
                 ],
                 "summary": "Update Inventory",
                 "parameters": [
@@ -124,6 +136,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "inventory"
+                ],
                 "summary": "Delete Inventory",
                 "parameters": [
                     {
@@ -150,7 +165,42 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "playbook"
+                ],
                 "summary": "List playbooks",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Playbook"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/playbooks/{dir}": {
+            "get": {
+                "description": "List all playbooks under dir",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "playbook"
+                ],
+                "summary": "List playbooks under dir",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "dir",
+                        "name": "dir",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -169,6 +219,9 @@
                 "description": "Get task result by task id when task finished",
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "result"
                 ],
                 "summary": "Get Task Result",
                 "parameters": [
@@ -196,6 +249,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "task"
+                ],
                 "summary": "List Task Info",
                 "responses": {
                     "200": {
@@ -215,6 +271,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "runner"
                 ],
                 "summary": "RunAdhoc",
                 "parameters": [
@@ -247,6 +306,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "runner"
+                ],
                 "summary": "RunPlaybook",
                 "parameters": [
                     {
@@ -274,6 +336,9 @@
                 "description": "Get task info",
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "task"
                 ],
                 "summary": "Get Task Info",
                 "parameters": [
@@ -311,6 +376,9 @@
         "models.Playbook": {
             "type": "object",
             "properties": {
+                "dir": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 }
@@ -345,13 +413,13 @@
                 "arg": {
                     "type": "string"
                 },
-                "host": {
-                    "type": "string"
-                },
                 "inventory": {
                     "type": "string"
                 },
                 "module": {
+                    "type": "string"
+                },
+                "pattern": {
                     "type": "string"
                 }
             }
@@ -359,6 +427,9 @@
         "models.RunPlaybookRequest": {
             "type": "object",
             "properties": {
+                "dir": {
+                    "type": "string"
+                },
                 "inventory": {
                     "type": "string"
                 },

@@ -19,6 +19,7 @@ var log = logger.Logger
 // @Accept  json
 // @Param data body models.Inventory  true "create inventory"
 // @Produce json
+// @Tags inventory
 // @Success 201 {object} models.Inventory
 // @Router /inventory/ [post]
 func Create(ctx *gin.Context) {
@@ -47,6 +48,7 @@ func Create(ctx *gin.Context) {
 // @Summary Update Inventory
 // @Description Update Inventory
 // @Accept  json
+// @Tags inventory
 // @Param data body models.Inventory  true "update inventory"
 // @Param name path string true "name"
 // @Produce json
@@ -78,6 +80,7 @@ func Update(ctx *gin.Context) {
 // @Summary List Inventory
 // @Description List Inventory
 // @Produce json
+// @Tags inventory
 // @Success 200 {array} models.Inventory
 // @Router /inventory/ [get]
 func List(ctx *gin.Context) {
@@ -92,6 +95,7 @@ func List(ctx *gin.Context) {
 // @Summary Get Inventory
 // @Description Get Inventory
 // @Produce json
+// @Tags inventory
 // @Param name path string true "name"
 // @Success 200 {object} models.Inventory
 // @Router /inventory/{name} [get]
@@ -108,6 +112,7 @@ func Get(ctx *gin.Context) {
 // @Summary Delete Inventory
 // @Description Delete Inventory
 // @Produce json
+// @Tags inventory
 // @Param name path string true "name"
 // @Success 200 {string} string "name"
 // @Router /inventory/{name} [delete]

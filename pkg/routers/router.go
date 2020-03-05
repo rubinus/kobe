@@ -15,6 +15,7 @@ func InitRouter(g *gin.Engine) {
 		p := v1.Group("/playbooks")
 		{
 			p.GET("/", playbook.List)
+			p.GET("/:dir", playbook.ListByDir)
 		}
 		i := v1.Group("/inventory")
 		{

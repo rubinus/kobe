@@ -9,6 +9,8 @@ definitions:
     type: object
   models.Playbook:
     properties:
+      dir:
+        type: string
       name:
         type: string
     type: object
@@ -31,15 +33,17 @@ definitions:
     properties:
       arg:
         type: string
-      host:
-        type: string
       inventory:
         type: string
       module:
         type: string
+      pattern:
+        type: string
     type: object
   models.RunPlaybookRequest:
     properties:
+      dir:
+        type: string
       inventory:
         type: string
       playbook:
@@ -82,6 +86,8 @@ paths:
               $ref: '#/definitions/models.Inventory'
             type: array
       summary: List Inventory
+      tags:
+      - inventory
     post:
       consumes:
       - application/json
@@ -101,6 +107,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Inventory'
       summary: Create Inventory
+      tags:
+      - inventory
   /inventory/{name}:
     delete:
       description: Delete Inventory
@@ -118,6 +126,8 @@ paths:
           schema:
             type: string
       summary: Delete Inventory
+      tags:
+      - inventory
     get:
       description: Get Inventory
       parameters:
@@ -134,6 +144,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Inventory'
       summary: Get Inventory
+      tags:
+      - inventory
     put:
       consumes:
       - application/json
@@ -158,6 +170,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Inventory'
       summary: Update Inventory
+      tags:
+      - inventory
   /playbooks/:
     get:
       description: List all playbooks
@@ -171,6 +185,29 @@ paths:
               $ref: '#/definitions/models.Playbook'
             type: array
       summary: List playbooks
+      tags:
+      - playbook
+  /playbooks/{dir}:
+    get:
+      description: List all playbooks under dir
+      parameters:
+      - description: dir
+        in: path
+        name: dir
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Playbook'
+            type: array
+      summary: List playbooks under dir
+      tags:
+      - playbook
   /result/{uid}:
     get:
       description: Get task result by task id when task finished
@@ -188,6 +225,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Result'
       summary: Get Task Result
+      tags:
+      - result
   /tasks/:
     get:
       description: List task info
@@ -199,6 +238,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Task'
       summary: List Task Info
+      tags:
+      - task
   /tasks/{uid}:
     get:
       description: Get task info
@@ -216,6 +257,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Task'
       summary: Get Task Info
+      tags:
+      - task
   /tasks/adhoc/:
     post:
       consumes:
@@ -236,6 +279,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Task'
       summary: RunAdhoc
+      tags:
+      - runner
   /tasks/playbook/:
     post:
       consumes:
@@ -256,4 +301,6 @@ paths:
           schema:
             $ref: '#/definitions/models.Task'
       summary: RunPlaybook
+      tags:
+      - runner
 swagger: "2.0"

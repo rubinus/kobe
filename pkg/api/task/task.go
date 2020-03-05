@@ -14,6 +14,7 @@ const (
 )
 
 // @Summary Get Task Info
+// @Tags task
 // @Description Get task info
 // @Param uid path string true "task_uid"
 // @Produce json
@@ -37,6 +38,7 @@ func Get(ctx *gin.Context) {
 
 // @Summary List Task Info
 // @Description List task info
+// @Tags task
 // @Produce json
 // @Success 200 {object} models.Task
 // @Router /tasks/ [get]

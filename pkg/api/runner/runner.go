@@ -15,6 +15,7 @@ const (
 )
 
 // @Summary RunAdhoc
+// @Tags runner
 // @Description Create Run Adhoc Task
 // @Accept  json
 // @Param data body models.RunAdhocRequest  true "create adhoc task"
@@ -50,6 +51,7 @@ func RunAdhoc(ctx *gin.Context) {
 }
 
 // @Summary RunPlaybook
+// @Tags runner
 // @Description Create Run Playbook Task
 // @Accept  json
 // @Param data body models.RunPlaybookRequest  true "create playbook task"
@@ -59,7 +61,7 @@ func RunAdhoc(ctx *gin.Context) {
 func RunPlaybook(ctx *gin.Context) {
 	var tr models.RunPlaybookRequest
 	if err := ctx.ShouldBindJSON(&tr); err != nil {
-		ctx.JSON(http.StatusBadRequest, err.Error())
+		ctx.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
 	}
 	r := ctx.MustGet("redis").(*redis.Client)
 	var task models.Task
@@ -67,16 +69,17 @@ func RunPlaybook(ctx *gin.Context) {
 	task.Args = map[string]string{
 		"inventory": tr.Inventory,
 		"playbook":  tr.Playbook,
+		"dir":       tr.Dir,
 	}
 	task.Type = "playbook"
 	task.CreatedTime = time.Now()
 	task.State = models.TaskStatePending
 	if _, err := r.HSet(taskSetKey, task.Uid, task).Result(); err != nil {
-		ctx.JSON(http.StatusInternalServerError, err.Error())
+		ctx.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
 		return
 	}
 	if _, err := r.LPush(taskQueueKey, task.Uid).Result(); err != nil {
-		ctx.JSON(http.StatusInternalServerError, err.Error())
+		ctx.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
 		return
 	}
 	ctx.JSON(http.StatusCreated, task)
