@@ -1,0 +1,8 @@
+---
+- name: "test"
+  hosts: "all"
+  tasks:
+    - name: "ping"
+      ping:
+    - name: "shell"
+      shell: "pwd"
