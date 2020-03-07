@@ -14,30 +14,31 @@ const (
 	taskSetKey   = "task"
 )
 
-// @Summary RunAdhoc
+// @Summary ImRunAdhoc
 // @Tags runner
-// @Description Create Run Adhoc Task
+// @Description Run Adhoc Task with Inventory Object
 // @Accept  json
-// @Param data body models.RunAdhocRequest  true "create adhoc task"
+// @Param data body models.ImRunAdhocRequest  true "request"
 // @Produce json
 // @Success 201 {object} models.Task
-// @Router /tasks/adhoc/ [post]
-func RunAdhoc(ctx *gin.Context) {
-	var tr models.RunAdhocRequest
+// @Router /runner/im/adhoc/ [post]
+func ImRunAdhoc(ctx *gin.Context) {
+	var tr models.ImRunAdhocRequest
 	if err := ctx.ShouldBindJSON(&tr); err != nil {
 		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
 	}
 	r := ctx.MustGet("redis").(*redis.Client)
 	var task models.Task
 	task.Uid = uuid.NewV4().String()
 	task.Args = map[string]string{
-		"inventory": tr.Inventory,
-		"pattern":   tr.Pattern,
-		"module":    tr.Module,
-		"arg":       tr.Arg,
+		"pattern": tr.Pattern,
+		"module":  tr.Module,
+		"arg":     tr.Arg,
 	}
 	task.CreatedTime = time.Now()
 	task.Type = "adhoc"
+	task.Inventory = tr.Inventory
 	task.State = models.TaskStatePending
 	if _, err := r.HSet(taskSetKey, task.Uid, task).Result(); err != nil {
 		ctx.JSON(http.StatusInternalServerError, err.Error())
@@ -50,26 +51,26 @@ func RunAdhoc(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, task)
 }
 
-// @Summary RunPlaybook
+// @Summary ImRunPlaybook
 // @Tags runner
-// @Description Create Run Playbook Task
+// @Description Create Run Playbook Task with Inventory Object
 // @Accept  json
-// @Param data body models.RunPlaybookRequest  true "create playbook task"
+// @Param data body models.RunPlaybookRequest  true "request"
 // @Produce json
 // @Success 201 {object} models.Task
-// @Router /tasks/playbook/ [post]
-func RunPlaybook(ctx *gin.Context) {
-	var tr models.RunPlaybookRequest
+// @Router /runner/im/playbook/ [post]
+func ImRunPlaybook(ctx *gin.Context) {
+	var tr models.ImRunPlaybookRequest
 	if err := ctx.ShouldBindJSON(&tr); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
+		return
 	}
 	r := ctx.MustGet("redis").(*redis.Client)
 	var task models.Task
 	task.Uid = uuid.NewV4().String()
 	task.Args = map[string]string{
-		"inventory": tr.Inventory,
-		"playbook":  tr.Playbook,
-		"dir":       tr.Dir,
+		"playbook": tr.Playbook,
+		"dir":      tr.Dir,
 	}
 	task.Type = "playbook"
 	task.CreatedTime = time.Now()

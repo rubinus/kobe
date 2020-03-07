@@ -57,7 +57,7 @@ func (w *Worker) work() error {
 		log.Errorf("can not work dir %s reason %s", workPath, err.Error())
 		return err
 	}
-	logPath := fmt.Sprintf("%s.log", path.Join(workPath, "run"))
+	logPath := fmt.Sprintf("%s.log", path.Join(workPath, "stdout"))
 	logFile, err := os.Create(logPath)
 	if err := w.saveTask(); err != nil {
 		log.Errorf("can not save task reason: %s", err.Error())
@@ -77,9 +77,10 @@ func (w *Worker) work() error {
 	case "playbook":
 		runner = &ansible.PlaybookRunner{}
 	default:
-		return errors.New(fmt.Sprintf("can not execute task type %s", w.CurrentTask.Type))
+		return errors.New(fmt.Sprintf("can not support task type %s", w.CurrentTask.Type))
 	}
-	runner.Run(w.CurrentTask.Args, workPath, logFile, &result)
+	runner.Run(w.CurrentTask.Args, w.CurrentTask.Inventory, workPath, logFile, &result)
+	result.EndTime = time.Now()
 	w.CurrentTask.State = models.TaskStateFinished
 	w.CurrentTask.Finished = true
 	if err := w.saveTask(); err != nil {

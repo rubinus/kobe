@@ -9,7 +9,6 @@ import (
 )
 
 const (
-	taskQueueKey = "queue"
 	taskSetKey   = "task"
 )
 

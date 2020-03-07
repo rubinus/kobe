@@ -7,7 +7,6 @@ import (
 	"io"
 	"os"
 	"os/exec"
-	"time"
 )
 
 type AnsibleExecuter struct {
@@ -40,18 +39,16 @@ func (e *AnsibleExecuter) Execute(command string, args []string, prefix string) 
 			_, _ = fmt.Fprint(e.Write, "\n", errorScanner.Text())
 		}
 	}()
-	timeInit := time.Now()
+	log.Debugf("execute cmd: [%s]", cmd.String())
 	err = cmd.Start()
 	if err != nil {
 		return errors.New("(Execute Error) -> " + err.Error())
 	}
 
 	err = cmd.Wait()
-	elapsedTime := time.Since(timeInit)
 	if err != nil {
 		return errors.New("(Execute Error) -> " + err.Error())
 	}
 
-	_, _ = fmt.Fprintf(e.Write, "Duration: %s\n", elapsedTime.String())
 	return nil
 }

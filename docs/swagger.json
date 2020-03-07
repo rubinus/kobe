@@ -9,156 +9,6 @@
     },
     "basePath": "/api/v1/",
     "paths": {
-        "/inventory/": {
-            "get": {
-                "description": "List Inventory",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "inventory"
-                ],
-                "summary": "List Inventory",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Inventory"
-                            }
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Create Inventory",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "inventory"
-                ],
-                "summary": "Create Inventory",
-                "parameters": [
-                    {
-                        "description": "create inventory",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.Inventory"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/models.Inventory"
-                        }
-                    }
-                }
-            }
-        },
-        "/inventory/{name}": {
-            "get": {
-                "description": "Get Inventory",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "inventory"
-                ],
-                "summary": "Get Inventory",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "name",
-                        "name": "name",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.Inventory"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "description": "Update Inventory",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "inventory"
-                ],
-                "summary": "Update Inventory",
-                "parameters": [
-                    {
-                        "description": "update inventory",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.Inventory"
-                        }
-                    },
-                    {
-                        "type": "string",
-                        "description": "name",
-                        "name": "name",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "202": {
-                        "description": "Accepted",
-                        "schema": {
-                            "$ref": "#/definitions/models.Inventory"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Delete Inventory",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "inventory"
-                ],
-                "summary": "Delete Inventory",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "name",
-                        "name": "name",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "name",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
         "/playbooks/": {
             "get": {
                 "description": "List all playbooks",
@@ -243,6 +93,74 @@
                 }
             }
         },
+        "/runner/im/adhoc/": {
+            "post": {
+                "description": "Run Adhoc Task with Inventory Object",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "runner"
+                ],
+                "summary": "ImRunAdhoc",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ImRunAdhocRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Task"
+                        }
+                    }
+                }
+            }
+        },
+        "/runner/im/playbook/": {
+            "post": {
+                "description": "Create Run Playbook Task with Inventory Object",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "runner"
+                ],
+                "summary": "ImRunPlaybook",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.RunPlaybookRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Task"
+                        }
+                    }
+                }
+            }
+        },
         "/tasks/": {
             "get": {
                 "description": "List task info",
@@ -256,74 +174,6 @@
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.Task"
-                        }
-                    }
-                }
-            }
-        },
-        "/tasks/adhoc/": {
-            "post": {
-                "description": "Create Run Adhoc Task",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "runner"
-                ],
-                "summary": "RunAdhoc",
-                "parameters": [
-                    {
-                        "description": "create adhoc task",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.RunAdhocRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/models.Task"
-                        }
-                    }
-                }
-            }
-        },
-        "/tasks/playbook/": {
-            "post": {
-                "description": "Create Run Playbook Task",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "runner"
-                ],
-                "summary": "RunPlaybook",
-                "parameters": [
-                    {
-                        "description": "create playbook task",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.RunPlaybookRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
                         "schema": {
                             "$ref": "#/definitions/models.Task"
                         }
@@ -362,14 +212,89 @@
         }
     },
     "definitions": {
-        "models.Inventory": {
+        "models.Group": {
             "type": "object",
             "properties": {
-                "content": {
+                "children": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "hosts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Host"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "vars": {
+                    "type": "object",
+                    "additionalProperties": true
+                }
+            }
+        },
+        "models.Host": {
+            "type": "object",
+            "properties": {
+                "connection": {
+                    "type": "string"
+                },
+                "ip": {
                     "type": "string"
                 },
                 "name": {
                     "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "integer"
+                },
+                "user": {
+                    "type": "string"
+                },
+                "vars": {
+                    "type": "object",
+                    "additionalProperties": true
+                }
+            }
+        },
+        "models.ImRunAdhocRequest": {
+            "type": "object",
+            "properties": {
+                "arg": {
+                    "type": "string"
+                },
+                "inventory": {
+                    "type": "object",
+                    "$ref": "#/definitions/models.Inventory"
+                },
+                "module": {
+                    "type": "string"
+                },
+                "pattern": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Inventory": {
+            "type": "object",
+            "properties": {
+                "groups": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Group"
+                    }
+                },
+                "hosts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Host"
+                    }
                 }
             }
         },
@@ -387,6 +312,9 @@
         "models.Result": {
             "type": "object",
             "properties": {
+                "content": {
+                    "type": "string"
+                },
                 "end_time": {
                     "type": "string"
                 },
@@ -404,23 +332,6 @@
                 },
                 "success": {
                     "type": "boolean"
-                }
-            }
-        },
-        "models.RunAdhocRequest": {
-            "type": "object",
-            "properties": {
-                "arg": {
-                    "type": "string"
-                },
-                "inventory": {
-                    "type": "string"
-                },
-                "module": {
-                    "type": "string"
-                },
-                "pattern": {
-                    "type": "string"
                 }
             }
         },
@@ -452,6 +363,10 @@
                 },
                 "finished": {
                     "type": "boolean"
+                },
+                "inventory": {
+                    "type": "object",
+                    "$ref": "#/definitions/models.Inventory"
                 },
                 "state": {
                     "type": "string"

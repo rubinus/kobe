@@ -6,5 +6,5 @@ import (
 )
 
 type Runnable interface {
-	Run(args map[string]string, workPath string, logFile *os.File, result *models.Result)
+	Run(args map[string]string, inventory models.Inventory, workPath string, logFile *os.File, result *models.Result)
 }

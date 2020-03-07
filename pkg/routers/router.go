@@ -2,7 +2,6 @@ package routers
 
 import (
 	"github.com/gin-gonic/gin"
-	"kobe/pkg/api/inventory"
 	"kobe/pkg/api/playbook"
 	"kobe/pkg/api/result"
 	"kobe/pkg/api/runner"
@@ -17,20 +16,19 @@ func InitRouter(g *gin.Engine) {
 			p.GET("/", playbook.List)
 			p.GET("/:dir", playbook.ListByDir)
 		}
-		i := v1.Group("/inventory")
-		{
-			i.GET("/", inventory.List)
-			i.POST("/", inventory.Create)
-			i.PUT("/:name", inventory.Update)
-			i.GET("/:name", inventory.Get)
-			i.DELETE("/:name", inventory.Delete)
-		}
 		t := v1.Group("tasks")
 		{
 			t.GET("/", task.List)
 			t.GET("/:uid", task.Get)
-			t.POST("/playbook/", runner.RunPlaybook)
-			t.POST("/adhoc/", runner.RunAdhoc)
+		}
+		ru := v1.Group("/runner")
+		{
+
+		}
+		im := ru.Group("/im")
+		{
+			im.POST("/playbook/", runner.ImRunPlaybook)
+			im.POST("/adhoc/", runner.ImRunAdhoc)
 		}
 		r := v1.Group("result")
 		{

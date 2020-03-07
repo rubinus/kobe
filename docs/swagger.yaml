@@ -1,11 +1,61 @@
 basePath: /api/v1/
 definitions:
-  models.Inventory:
+  models.Group:
     properties:
-      content:
+      children:
+        items:
+          type: string
+        type: array
+      hosts:
+        items:
+          $ref: '#/definitions/models.Host'
+        type: array
+      name:
+        type: string
+      vars:
+        additionalProperties: true
+        type: object
+    type: object
+  models.Host:
+    properties:
+      connection:
+        type: string
+      ip:
         type: string
       name:
         type: string
+      password:
+        type: string
+      port:
+        type: integer
+      user:
+        type: string
+      vars:
+        additionalProperties: true
+        type: object
+    type: object
+  models.ImRunAdhocRequest:
+    properties:
+      arg:
+        type: string
+      inventory:
+        $ref: '#/definitions/models.Inventory'
+        type: object
+      module:
+        type: string
+      pattern:
+        type: string
+    type: object
+  models.Inventory:
+    properties:
+      groups:
+        items:
+          $ref: '#/definitions/models.Group'
+        type: array
+      hosts:
+        items:
+          $ref: '#/definitions/models.Host'
+        type: array
     type: object
   models.Playbook:
     properties:
@@ -16,6 +66,8 @@ definitions:
     type: object
   models.Result:
     properties:
+      content:
+        type: string
       end_time:
         type: string
       logfile:
@@ -28,17 +80,6 @@ definitions:
         type: string
       success:
         type: boolean
-    type: object
-  models.RunAdhocRequest:
-    properties:
-      arg:
-        type: string
-      inventory:
-        type: string
-      module:
-        type: string
-      pattern:
-        type: string
     type: object
   models.RunPlaybookRequest:
     properties:
@@ -59,6 +100,9 @@ definitions:
         type: string
       finished:
         type: boolean
+      inventory:
+        $ref: '#/definitions/models.Inventory'
+        type: object
       state:
         type: string
       type:
@@ -73,105 +117,6 @@ info:
   title: Kobe Restful API
   version: 0.0.1
 paths:
-  /inventory/:
-    get:
-      description: List Inventory
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.Inventory'
-            type: array
-      summary: List Inventory
-      tags:
-      - inventory
-    post:
-      consumes:
-      - application/json
-      description: Create Inventory
-      parameters:
-      - description: create inventory
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/models.Inventory'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/models.Inventory'
-      summary: Create Inventory
-      tags:
-      - inventory
-  /inventory/{name}:
-    delete:
-      description: Delete Inventory
-      parameters:
-      - description: name
-        in: path
-        name: name
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: name
-          schema:
-            type: string
-      summary: Delete Inventory
-      tags:
-      - inventory
-    get:
-      description: Get Inventory
-      parameters:
-      - description: name
-        in: path
-        name: name
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Inventory'
-      summary: Get Inventory
-      tags:
-      - inventory
-    put:
-      consumes:
-      - application/json
-      description: Update Inventory
-      parameters:
-      - description: update inventory
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/models.Inventory'
-      - description: name
-        in: path
-        name: name
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "202":
-          description: Accepted
-          schema:
-            $ref: '#/definitions/models.Inventory'
-      summary: Update Inventory
-      tags:
-      - inventory
   /playbooks/:
     get:
       description: List all playbooks
@@ -227,6 +172,50 @@ paths:
       summary: Get Task Result
       tags:
       - result
+  /runner/im/adhoc/:
+    post:
+      consumes:
+      - application/json
+      description: Run Adhoc Task with Inventory Object
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.ImRunAdhocRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Task'
+      summary: ImRunAdhoc
+      tags:
+      - runner
+  /runner/im/playbook/:
+    post:
+      consumes:
+      - application/json
+      description: Create Run Playbook Task with Inventory Object
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.RunPlaybookRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Task'
+      summary: ImRunPlaybook
+      tags:
+      - runner
   /tasks/:
     get:
       description: List task info
@@ -259,48 +248,4 @@ paths:
       summary: Get Task Info
       tags:
       - task
-  /tasks/adhoc/:
-    post:
-      consumes:
-      - application/json
-      description: Create Run Adhoc Task
-      parameters:
-      - description: create adhoc task
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/models.RunAdhocRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/models.Task'
-      summary: RunAdhoc
-      tags:
-      - runner
-  /tasks/playbook/:
-    post:
-      consumes:
-      - application/json
-      description: Create Run Playbook Task
-      parameters:
-      - description: create playbook task
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/models.RunPlaybookRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/models.Task'
-      summary: RunPlaybook
-      tags:
-      - runner
 swagger: "2.0"
