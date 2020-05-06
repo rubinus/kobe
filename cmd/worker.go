@@ -1,15 +1,22 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/spf13/cobra"
-	container "kobe/pkg/worker"
+	"kobe/pkg/models"
 )
 
+var id string
+
 var workerCmd = &cobra.Command{
-	Use:   "worker",
-	Short: "A brief description of your command",
+	Use:   "inventory",
+	Short: "dynamic inventory provider",
 	Run: func(cmd *cobra.Command, args []string) {
-		container.Run()
+		s, err := models.GetInventoryFromCache(id)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Print(s)
 	},
 }
 

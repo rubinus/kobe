@@ -1,5 +1,10 @@
 package models
 
+import (
+	uuid "github.com/satori/go.uuid"
+	"kobe/pkg/connections"
+)
+
 type Host struct {
 	Ip         string                 `json:"ip"`
 	Name       string                 `json:"name"`
@@ -18,11 +23,21 @@ type Group struct {
 }
 
 type Inventory struct {
-	Hosts  []Host  `json:"hosts"`
-	Groups []Group `json:"groups"`
+	Hosts  []Host                 `json:"hosts"`
+	Groups []Group                `json:"groups"`
+	Vars   map[string]interface{} `json:"vars"`
 }
 
-func (i *Inventory) Data() map[string]interface{} {
+func (i Inventory) SaveToCache() (string, error) {
+	id := uuid.NewV4().String()
+	_, err := connections.Redis.Set(id, i, -1).Result()
+	if err != nil {
+		return "", err
+	}
+	return id, nil
+}
+
+func (i Inventory) parse() map[string]interface{} {
 	allGroup := Group{
 		Name: "all",
 		Hosts: append(i.Hosts, Host{
@@ -32,7 +47,7 @@ func (i *Inventory) Data() map[string]interface{} {
 			Connection: "local",
 			Vars:       map[string]interface{}{},
 		}),
-		Vars: map[string]interface{}{},
+		Vars: i.Vars,
 	}
 	groups := append(i.Groups, allGroup)
 	groupMap := map[string]interface{}{}
@@ -61,4 +76,12 @@ func (i *Inventory) Data() map[string]interface{} {
 		groupMap[group.Name] = gm
 	}
 	return groupMap
+}
+
+func GetInventoryFromCache(id string) (string, error) {
+	s, err := connections.Redis.Get(id).Result()
+	if err != nil {
+		return "", err
+	}
+	return s, nil
 }

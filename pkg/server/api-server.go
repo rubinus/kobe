@@ -14,7 +14,6 @@ func Run() error {
 	connections.ConnectRedis()
 	app := gin.Default()
 	app.Use(middlewares.SetRedis)
-	app.Delims("{[", "]}")
 	app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	routers.InitRouter(app)
 	bind := viper.GetString("server.bind")
