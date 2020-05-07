@@ -21,12 +21,12 @@ const (
 )
 
 type PlaybookRunner struct {
-	Playbook models.Playbook
+	Project models.Project
 }
 
-func (p *PlaybookRunner) Run(inventoryId, play string, result *models.Result) {
+func (p *PlaybookRunner) Run(inventoryId string, playbook models.Playbook, result *models.Result) {
 
-	workPath, err := initWorkSpace(p.Playbook)
+	workPath, err := initWorkSpace(p.Project)
 	if err != nil {
 		result.Message = err.Error()
 		return
@@ -42,8 +42,9 @@ func (p *PlaybookRunner) Run(inventoryId, play string, result *models.Result) {
 		os.Chdir(pwd)
 		result.EndTime = time.Now()
 	}()
-	cmd := exec.Command("ansible",
-		"-i", fmt.Sprintf(path.Join(pwd, "kobe")), fmt.Sprintf("--%s", inventoryId))
+	cmd := exec.Command("ansible-playbook",
+		"-i", fmt.Sprintf(path.Join(pwd, "kobe")), fmt.Sprintf("--%s", inventoryId),
+		string(playbook))
 	if err := cmd.Run(); err != nil {
 		result.Success = false
 		result.Message = err.Error()
@@ -72,8 +73,8 @@ func readResultFile(workPath string) (interface{}, error) {
 	return result, nil
 }
 
-func initWorkSpace(playbook models.Playbook) (string, error) {
-	workPath := path.Join(tempPath, string(playbook))
+func initWorkSpace(project models.Project) (string, error) {
+	workPath := path.Join(tempPath, project.Name)
 	if err := os.MkdirAll(workPath, 0755); err != nil {
 		return "", err
 	}

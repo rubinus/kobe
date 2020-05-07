@@ -1,9 +1,9 @@
-package result
+package api
 
 import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
-	"kobe/pkg/connections"
+	"kobe/pkg/redis"
 	"kobe/pkg/models"
 	"net/http"
 )
@@ -12,9 +12,9 @@ const (
 	resultKey = "result"
 )
 
-func Get(ctx *gin.Context) {
+func GetResult(ctx *gin.Context) {
 	uid := ctx.Param("id")
-	t, err := connections.Redis.HGet(resultKey, uid).Result()
+	t, err := redis.Redis.HGet(resultKey, uid).Result()
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, err.Error())
 		return

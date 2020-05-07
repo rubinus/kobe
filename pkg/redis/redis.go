@@ -1,4 +1,4 @@
-package connections
+package redis
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ var (
 	Redis *redis.Client
 )
 
-func ConnectRedis() {
+func InitRedis() {
 	host := viper.GetString("server.redis.host")
 	port := viper.GetInt("server.redis.port")
 	db := viper.GetInt("server.redis.db")

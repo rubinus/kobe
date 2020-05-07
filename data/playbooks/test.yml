@@ -1,6 +1,0 @@
----
-- name: "test"
-  hosts: "example"
-  tasks:
-    - name: "ping"
-      ping:

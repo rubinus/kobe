@@ -53,11 +53,12 @@ func lookUpStorage() ([]models.Project, error) {
 	}
 	for _, d := range rd {
 		if d.IsDir() {
-			playbooks, err := searchPlays(d.Name())
+			playbooks, err := searchPlays(path.Join(constant.ProjectDir, d.Name()))
 			if err != nil {
 				return nil, err
 			}
 			results = append(results, models.Project{
+				Name:      d.Name(),
 				Playbooks: playbooks,
 			})
 		}

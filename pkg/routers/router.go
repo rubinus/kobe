@@ -3,8 +3,6 @@ package routers
 import (
 	"github.com/gin-gonic/gin"
 	"kobe/pkg/api"
-	"kobe/pkg/api/result"
-	"kobe/pkg/api/runner"
 )
 
 func InitRouter(g *gin.Engine) {
@@ -17,11 +15,11 @@ func InitRouter(g *gin.Engine) {
 		}
 		ru := v1.Group("/runner")
 		{
-			ru.POST("/", runner.RunPlaybook)
+			ru.POST("/:project", api.RunPlaybook)
 		}
 		r := v1.Group("result")
 		{
-			r.GET("/:id", result.Get)
+			r.GET("/:id", api.GetResult)
 		}
 	}
 }
