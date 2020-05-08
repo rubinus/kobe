@@ -31,31 +31,6 @@ func getInventoryFromCache(id string) (*models.Inventory, error) {
 	return &inventory, nil
 }
 
-func HostHandler() (Result, error) {
-	id, err := getInventoryIdFromEnv()
-	if err != nil {
-		return nil, err
-	}
-	inventory, _ := getInventoryFromCache(id)
-	hostMap := make(map[string]map[string]interface{})
-	for _, host := range inventory.Hosts {
-		vars := make(map[string]interface{})
-		hostMap[host.Name] = map[string]interface{}{
-			"ansible_ssh_host": host.Ip,
-			"ansible_ssh_port": host.Port,
-			"ansible_ssh_user": host.User,
-			"ansible_ssh_pass": host.Password,
-		}
-		if host.Vars != nil {
-			for k, v := range host.Vars {
-				vars[k] = v
-			}
-			hostMap["vars"] = vars
-		}
-	}
-	return hostMap, nil
-}
-
 func ListHandler() (Result, error) {
 	id, err := getInventoryIdFromEnv()
 	if err != nil {
@@ -66,7 +41,7 @@ func ListHandler() (Result, error) {
 	for _, group := range inventory.Groups {
 
 		m := map[string]interface{}{
-			"hosts":    group.Hosts,
+			"hosts": group.Hosts,
 		}
 		if group.Children != nil {
 			m["children"] = group.Children
@@ -76,6 +51,25 @@ func ListHandler() (Result, error) {
 		}
 		allGroup[group.Name] = m
 	}
+	meta := map[string]interface{}{}
+	hostVars := map[string]interface{}{}
+	for _, host := range inventory.Hosts {
+		vars := make(map[string]interface{})
+		hostVars[host.Name] = map[string]interface{}{
+			"ansible_ssh_host": host.Ip,
+			"ansible_ssh_port": host.Port,
+			"ansible_ssh_user": host.User,
+			"ansible_ssh_pass": host.Password,
+		}
+		if host.Vars != nil {
+			for k, v := range host.Vars {
+				vars[k] = v
+			}
+			hostVars["vars"] = vars
+		}
+	}
+	meta["hostvars"] = hostVars
+	allGroup["_meta"] = meta
 	return allGroup, nil
 }
 

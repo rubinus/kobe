@@ -14,7 +14,6 @@ var rootCmd = &cobra.Command{
 	Short: "A inventory provider for kobe",
 	Run: func(cmd *cobra.Command, args []string) {
 		list, err := cmd.Flags().GetBool("list")
-		host, err := cmd.Flags().GetBool("host")
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -29,20 +28,10 @@ var rootCmd = &cobra.Command{
 			fmt.Println(result)
 			os.Exit(0)
 		}
-		if host {
-			result, err := inventory.HostHandler()
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
-			fmt.Println(result)
-			os.Exit(0)
-		}
 	},
 }
 
 func init() {
-	rootCmd.Flags().Bool("host", false, "")
 	rootCmd.Flags().Bool("list", false, "")
 }
 

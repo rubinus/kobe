@@ -11,8 +11,8 @@ import (
 )
 
 func main() {
-	redis.InitRedis()
 	config.InitConfig()
+	redis.InitRedis()
 	app := gin.Default()
 	app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	routers.InitRouter(app)

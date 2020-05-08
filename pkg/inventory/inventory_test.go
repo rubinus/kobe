@@ -51,17 +51,6 @@ func TestListHandler(t *testing.T) {
 		t.Error(err)
 	}
 	fmt.Print(m)
-
 }
 
-func TestHostHandler(t *testing.T) {
-	config.InitConfig()
-	redis.InitRedis()
-	_ = os.Setenv("inventoryId", "c5149d76-933c-425b-81ff-9bab1745b019")
-	m, err := HostHandler()
-	if err != nil {
-		t.Error(err)
-	}
-	fmt.Print(m)
 
-}

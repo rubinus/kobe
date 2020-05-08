@@ -74,7 +74,7 @@ class CallbackModule(CallbackBase):
                     'start': current_time()
                 }
             },
-            'hosts.json': {}
+            'results': {}
         }
 
     def v2_playbook_on_play_start(self, play):

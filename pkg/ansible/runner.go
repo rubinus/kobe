@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"kobe/pkg/constant"
 	"kobe/pkg/models"
 	"os"
 	"os/exec"
@@ -13,11 +14,9 @@ import (
 )
 
 const (
-	ansibleTemplateFileName = "ansible.cfg.tmpl"
-	ansibleCfgFileName      = "ansible.cfg"
-	ansiblePluginDirName    = "plugins"
-	resultFileName          = "result.json"
-	tempPath                = "tmp"
+	ansibleCfgFileName   = "ansible.cfg"
+	ansiblePluginDirName = "plugins"
+	resultFileName       = "result.json"
 )
 
 type PlaybookRunner struct {
@@ -42,9 +41,11 @@ func (p *PlaybookRunner) Run(inventoryId string, playbook models.Playbook, resul
 		os.Chdir(pwd)
 		result.EndTime = time.Now()
 	}()
-	cmd := exec.Command("ansible-playbook",
-		"-i", fmt.Sprintf(path.Join(pwd, "kobe")), fmt.Sprintf("--%s", inventoryId),
-		string(playbook))
+	cmd := exec.Command(
+		constant.AnsiblePlaybookBinPath,
+		"-i", constant.InventoryProviderBinPath,
+		path.Join(constant.ProjectDir, p.Project.Name, string(playbook)))
+	cmd.Env = append(os.Environ(), fmt.Sprintf("inventoryId=%s", inventoryId))
 	if err := cmd.Run(); err != nil {
 		result.Success = false
 		result.Message = err.Error()
@@ -74,7 +75,7 @@ func readResultFile(workPath string) (interface{}, error) {
 }
 
 func initWorkSpace(project models.Project) (string, error) {
-	workPath := path.Join(tempPath, project.Name)
+	workPath := path.Join(constant.WorkDir, project.Name)
 	if err := os.MkdirAll(workPath, 0755); err != nil {
 		return "", err
 	}
@@ -89,7 +90,7 @@ func initWorkSpace(project models.Project) (string, error) {
 }
 
 func renderConfig(workPath string) error {
-	tmpl := path.Join(workPath, "ansible", ansibleTemplateFileName)
+	tmpl := constant.AnsibleTemplateFilePath
 	file, err := os.OpenFile(path.Join(workPath, ansibleCfgFileName), os.O_CREATE|os.O_RDWR, 0755)
 	if err != nil {
 		return err
@@ -107,13 +108,15 @@ func renderConfig(workPath string) error {
 }
 
 func initPlugin(workPath string) error {
-	pwd, err := os.Getwd()
-	if err != nil {
-		return err
+	projectPluginDir := path.Join(workPath, ansiblePluginDirName)
+	_, err := os.Stat(projectPluginDir)
+	if os.IsNotExist(err) {
+		if err := os.Symlink(constant.AnsiblePluginDir, path.Join(workPath, ansiblePluginDirName))
+			err != nil {
+			return err
+		}
+		return nil
 	}
-	if err := os.Symlink(path.Join(pwd, "ansible", ansiblePluginDirName),
-		path.Join(workPath, ansiblePluginDirName)); err != nil {
-		return err
-	}
-	return nil
+
+	return err
 }
