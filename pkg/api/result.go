@@ -3,8 +3,8 @@ package api
 import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
-	"kobe/pkg/redis"
 	"kobe/pkg/models"
+	"kobe/pkg/redis"
 	"net/http"
 )
 

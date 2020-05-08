@@ -4,8 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
 	"kobe/pkg/ansible"
-	"kobe/pkg/redis"
 	"kobe/pkg/models"
+	"kobe/pkg/redis"
 	"net/http"
 	"time"
 )
@@ -43,15 +43,21 @@ func RunPlaybook(ctx *gin.Context) {
 	taskId := uuid.NewV4().String()
 	go func() {
 		result := &models.Result{
-			StartTime: time.Time{},
-			EndTime:   time.Time{},
+			StartTime: time.Now(),
+			EndTime:   nil,
 			Message:   "",
 			Success:   false,
 			Content:   nil,
 		}
+		_, err := redis.Redis.Set(taskId, result, 24*time.Hour).Result()
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
+		}
 		r.Run(inventoryId, playbook, result)
-		_, _ = redis.Redis.Set(taskId, result, -1).Result()
+		_, err = redis.Redis.Set(taskId, result, 24*time.Hour).Result()
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"msg": err.Error()})
+		}
 	}()
-
 	ctx.JSON(http.StatusOK, RunPlaybookResponse{TaskId: taskId})
 }
