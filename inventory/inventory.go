@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"kobe/pkg/models"
+	"kobe/api"
 	"kobe/pkg/redis"
 	"os"
 )
@@ -19,12 +19,12 @@ func (r Result) String() string {
 	return string(b)
 }
 
-func getInventoryFromCache(id string) (*models.Inventory, error) {
+func getInventoryFromCache(id string) (*api.Inventory, error) {
 	i, err := redis.Redis.Get(id).Result()
 	if err != nil {
 		return nil, err
 	}
-	var inventory models.Inventory
+	var inventory api.Inventory
 	if err := json.Unmarshal([]byte(i), &inventory); err != nil {
 		return nil, err
 	}
