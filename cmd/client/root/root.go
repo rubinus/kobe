@@ -1,6 +1,10 @@
 package root
 
-import "github.com/spf13/cobra"
+import (
+	"github.com/spf13/cobra"
+	"kobe/cmd/client/playbook"
+	"kobe/cmd/client/project"
+)
 
 var Cmd = &cobra.Command{
 	Use:   "kobe",
@@ -8,5 +12,6 @@ var Cmd = &cobra.Command{
 }
 
 func init() {
-	Cmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	Cmd.AddCommand(project.Cmd)
+	Cmd.AddCommand(playbook.Cmd)
 }

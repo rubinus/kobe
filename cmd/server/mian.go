@@ -16,12 +16,14 @@ func main() {
 	address := fmt.Sprintf("%s:%d",
 		viper.GetString("server.host"),
 		viper.GetInt("server.port"))
+	fmt.Println(address)
 	s, err := net.Listen("tcp", address)
 	if err != nil {
 		log.Fatal(err)
 	}
 	gs := grpc.NewServer()
-	api.RegisterKobeApiServer(gs, &server.Kobe{})
+	kobe := server.NewKobe()
+	api.RegisterKobeApiServer(gs, kobe)
 	if err := gs.Serve(s); err != nil {
 		log.Fatal(err)
 	}

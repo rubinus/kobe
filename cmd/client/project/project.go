@@ -2,7 +2,6 @@ package project
 
 import (
 	"github.com/spf13/cobra"
-	"kobe/cmd/client/root"
 )
 
 var Cmd = &cobra.Command{
@@ -10,5 +9,6 @@ var Cmd = &cobra.Command{
 }
 
 func init() {
-	root.Cmd.AddCommand(Cmd)
+	Cmd.AddCommand(projectListCmd)
+	Cmd.AddCommand(projectCreateCmd)
 }

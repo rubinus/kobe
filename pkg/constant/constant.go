@@ -7,6 +7,7 @@ const (
 	InventoryProviderBinPath = "/Users/shenchenyang/go/bin/inventory"
 	AnsiblePlaybookBinPath   = "ansible-playbook"
 	InventoryEnvKey          = "KO_INVENTORY_ID"
+	TaskEnvKey               = "KO_TASK_ID"
 )
 
 var (

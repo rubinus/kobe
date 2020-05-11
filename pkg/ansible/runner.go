@@ -2,7 +2,7 @@ package ansible
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"kobe/api"
 	"kobe/pkg/constant"
 	"os"
@@ -35,62 +35,47 @@ func (p *PlaybookRunner) Run(ch chan []byte, result *api.Result) {
 		result.Message = err.Error()
 		return
 	}
-
 	os.Chdir(workPath)
 	defer func() {
 		os.Chdir(pwd)
 		result.EndTime = time.Now().String()
 	}()
-	cmd := exec.Command(
-		constant.AnsiblePlaybookBinPath,
+	cmd := exec.Command(constant.AnsiblePlaybookBinPath,
 		"-i", constant.InventoryProviderBinPath,
 		path.Join(constant.ProjectDir, p.Project.Name, p.Playbook))
-	cmd.Env = append(os.Environ(), fmt.Sprintf("%s=%s", constant.InventoryEnvKey, p.InventoryId))
-	reader, err := cmd.StdoutPipe()
+	cmdEnv := make([]string, 0)
+	cmdEnv = append(cmdEnv, fmt.Sprintf("%s=%s", constant.InventoryEnvKey, p.InventoryId))
+	cmdEnv = append(cmdEnv, fmt.Sprintf("%s=%s", constant.TaskEnvKey, result.Id))
+	cmd.Env = append(os.Environ(), cmdEnv...)
+	fmt.Println(cmd.String())
+	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		result.Success = false
 		result.Message = err.Error()
 		return
 	}
-	go func() {
-		var buffer []byte
-		for {
-			_, err = reader.Read(buffer)
-			if err != nil {
-				break
-			}
-			ch <- buffer
-		}
-		close(ch)
-	}()
 	if err := cmd.Start(); err != nil {
 		result.Success = false
 		result.Message = err.Error()
 		return
 	}
+	buf := make([]byte, 4096)
+	for {
+		nr, err := stdout.Read(buf)
+		if nr > 0 {
+			ch <- buf[:nr]
+		}
+		if err != nil || io.EOF == err {
+			break
+		}
+	}
+	close(ch)
 	if err = cmd.Wait(); err != nil {
 		result.Success = false
 		result.Message = err.Error()
 		return
 	}
-	_ = reader.Close()
-	content, err := readResultFile(workPath)
-	if err != nil {
-		result.Success = false
-		result.Message = err.Error()
-		return
-	}
-	result.Content = content
 	result.Success = true
-}
-
-func readResultFile(workPath string) (string, error) {
-	p := path.Join(workPath, resultFileName)
-	content, err := ioutil.ReadFile(p)
-	if err != nil {
-		return "", err
-	}
-	return string(content), nil
 }
 
 func initWorkSpace(project api.Project) (string, error) {
@@ -136,6 +121,5 @@ func initPlugin(workPath string) error {
 		}
 		return nil
 	}
-
 	return err
 }

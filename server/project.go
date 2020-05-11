@@ -22,7 +22,7 @@ func (pm ProjectManager) GetProject(name string) (*api.Project, error) {
 	}
 	for _, p := range projects {
 		if p.Name == name {
-			return &p, nil
+			return p, nil
 		}
 	}
 	return nil, errors.New(fmt.Sprintf("can not find project:%s", name))

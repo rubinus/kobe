@@ -9,8 +9,9 @@ require (
 	github.com/go-redis/redis/v7 v7.2.0
 	github.com/golang/protobuf v1.3.3
 	github.com/mitchellh/go-homedir v1.1.0
+	github.com/patrickmn/go-cache v2.1.0+incompatible
+	github.com/prometheus/common v0.4.0
 	github.com/satori/go.uuid v1.2.0
-	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/cobra v0.0.6
 	github.com/spf13/viper v1.4.0
 	github.com/swaggo/gin-swagger v1.2.0

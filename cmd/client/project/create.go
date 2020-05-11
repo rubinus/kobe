@@ -1,14 +1,32 @@
 package project
 
-import "github.com/spf13/cobra"
+import (
+	"fmt"
+	"github.com/spf13/cobra"
+	"kobe/client"
+	"log"
+)
 
-var projectListCmd = &cobra.Command{
-	Use: "list",
+var projectCreateCmd = &cobra.Command{
+	Use: "create",
 	Run: func(cmd *cobra.Command, args []string) {
-
+		c := client.NewKobeClient("127.0.0.1", 8080)
+		if len(args) < 0 {
+			log.Fatal("invalid project source")
+		}
+		name, err := cmd.Flags().GetString("name")
+		if err != nil {
+			log.Fatal(err)
+		}
+		source := args[0]
+		p, err := c.CreateProject(name, source)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("project %s created", p.Name)
 	},
 }
 
 func init() {
-	Cmd.AddCommand(projectListCmd)
+	projectCreateCmd.Flags().String("name", "", "")
 }

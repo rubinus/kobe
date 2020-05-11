@@ -2,7 +2,6 @@ package playbook
 
 import (
 	"github.com/spf13/cobra"
-	"kobe/cmd/client/root"
 )
 
 var Cmd = &cobra.Command{
@@ -10,6 +9,6 @@ var Cmd = &cobra.Command{
 }
 
 func init() {
-	root.Cmd.AddCommand(Cmd)
+	Cmd.AddCommand(playbookListCmd)
+	Cmd.AddCommand(playbookRunCmd)
 }
-

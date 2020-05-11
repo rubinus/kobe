@@ -8,6 +8,13 @@ import (
 	"kobe/api"
 )
 
+func NewKobeClient(host string, port int) *KobeClient {
+	return &KobeClient{
+		host: host,
+		port: port,
+	}
+}
+
 type KobeClient struct {
 	host string
 	port int
@@ -78,6 +85,9 @@ func (c KobeClient) RunPlaybook(project, playbook string, inventory api.Inventor
 		}
 	}
 	return nil
+}
+func (c *KobeClient) GetResult(taskId string) {
+
 }
 
 func (c *KobeClient) createConnection() (*grpc.ClientConn, error) {

@@ -7,6 +7,8 @@ service KobeApi {
   rpc ListProject(ListProjectRequest) returns(ListProjectResponse){}
   rpc GetInventory(GetInventoryRequest) returns(GetInventoryResponse){}
   rpc RunPlaybook(RunPlaybookRequest) returns(stream WatchStream){}
+  rpc SaveResult(SaveResultRequest) returns(SaveResultResponse){}
+  rpc GetResult(GetResultRequest) returns(GetResultResponse){}
 }
 
 message Project{
@@ -57,12 +59,13 @@ message RunPlaybookRequest {
 }
 
 message Result {
-  string startTime = 1;
-  string endTime = 2;
-  string message = 3;
-  bool success = 4;
-  bool finished = 5;
-  string content = 6;
+  string id = 1;
+  string startTime = 2;
+  string endTime = 3;
+  string message = 4;
+  bool success = 5;
+  bool finished = 6;
+  string content = 7;
 }
 
 message WatchStream {
@@ -76,5 +79,21 @@ message GetInventoryRequest {
 
 message GetInventoryResponse {
   Inventory item = 1;
+}
+
+message SaveResultRequest{
+  Result item = 1;
+}
+
+message SaveResultResponse{
+  Result item = 1;
+}
+
+message GetResultRequest{
+  string taskId = 1;
+}
+
+message GetResultResponse{
+  Result item = 1;
 }
 
