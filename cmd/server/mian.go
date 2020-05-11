@@ -1,24 +1,28 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
+	"fmt"
 	"github.com/spf13/viper"
-	ginSwagger "github.com/swaggo/gin-swagger"
-	"github.com/swaggo/gin-swagger/swaggerFiles"
+	"google.golang.org/grpc"
+	"kobe/api"
 	"kobe/pkg/config"
-	"kobe/pkg/redis"
-	"kobe/pkg/routers"
+	"kobe/server"
+	"log"
+	"net"
 )
 
 func main() {
 	config.InitConfig()
-	redis.InitRedis()
-	app := gin.Default()
-	app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	routers.InitRouter(app)
-	bind := viper.GetString("server.bind")
-	err := app.Run(bind)
+	address := fmt.Sprintf("%s:%d",
+		viper.GetString("server.host"),
+		viper.GetInt("server.port"))
+	s, err := net.Listen("tcp", address)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
+	}
+	gs := grpc.NewServer()
+	api.RegisterKobeApiServer(gs, &server.Kobe{})
+	if err := gs.Serve(s); err != nil {
+		log.Fatal(err)
 	}
 }

@@ -6,6 +6,7 @@ const (
 	BaseDir                  = "/Users/shenchenyang/go/src/kobe/"
 	InventoryProviderBinPath = "/Users/shenchenyang/go/bin/inventory"
 	AnsiblePlaybookBinPath   = "ansible-playbook"
+	InventoryEnvKey          = "KO_INVENTORY_ID"
 )
 
 var (

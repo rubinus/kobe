@@ -1,11 +1,10 @@
 package ansible
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"kobe/api"
 	"kobe/pkg/constant"
-	"kobe/pkg/models"
 	"os"
 	"os/exec"
 	"path"
@@ -20,11 +19,12 @@ const (
 )
 
 type PlaybookRunner struct {
-	Project models.Project
+	Project     api.Project
+	Playbook    string
+	InventoryId string
 }
 
-func (p *PlaybookRunner) Run(inventoryId string, playbook models.Playbook, result *models.Result) {
-
+func (p *PlaybookRunner) Run(ch chan []byte, result *api.Result) {
 	workPath, err := initWorkSpace(p.Project)
 	if err != nil {
 		result.Message = err.Error()
@@ -39,42 +39,61 @@ func (p *PlaybookRunner) Run(inventoryId string, playbook models.Playbook, resul
 	os.Chdir(workPath)
 	defer func() {
 		os.Chdir(pwd)
-		result.EndTime = time.Now()
+		result.EndTime = time.Now().String()
 	}()
 	cmd := exec.Command(
 		constant.AnsiblePlaybookBinPath,
 		"-i", constant.InventoryProviderBinPath,
-		path.Join(constant.ProjectDir, p.Project.Name, string(playbook)))
-	cmd.Env = append(os.Environ(), fmt.Sprintf("inventoryId=%s", inventoryId))
-	if err := cmd.Run(); err != nil {
+		path.Join(constant.ProjectDir, p.Project.Name, p.Playbook))
+	cmd.Env = append(os.Environ(), fmt.Sprintf("%s=%s", constant.InventoryEnvKey, p.InventoryId))
+	reader, err := cmd.StdoutPipe()
+	if err != nil {
 		result.Success = false
 		result.Message = err.Error()
-	} else {
-		content, err := readResultFile(workPath)
-		if err != nil {
-			result.Message = err.Error()
-		}
-		result.Content = content
-		result.Success = true
+		return
 	}
-
+	go func() {
+		var buffer []byte
+		for {
+			_, err = reader.Read(buffer)
+			if err != nil {
+				break
+			}
+			ch <- buffer
+		}
+		close(ch)
+	}()
+	if err := cmd.Start(); err != nil {
+		result.Success = false
+		result.Message = err.Error()
+		return
+	}
+	if err = cmd.Wait(); err != nil {
+		result.Success = false
+		result.Message = err.Error()
+		return
+	}
+	_ = reader.Close()
+	content, err := readResultFile(workPath)
+	if err != nil {
+		result.Success = false
+		result.Message = err.Error()
+		return
+	}
+	result.Content = content
+	result.Success = true
 }
 
-func readResultFile(workPath string) (interface{}, error) {
+func readResultFile(workPath string) (string, error) {
 	p := path.Join(workPath, resultFileName)
 	content, err := ioutil.ReadFile(p)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-	var result interface{}
-	if err := json.Unmarshal(content, &result); err != nil {
-		return nil, err
-	}
-
-	return result, nil
+	return string(content), nil
 }
 
-func initWorkSpace(project models.Project) (string, error) {
+func initWorkSpace(project api.Project) (string, error) {
 	workPath := path.Join(constant.WorkDir, project.Name)
 	if err := os.MkdirAll(workPath, 0755); err != nil {
 		return "", err

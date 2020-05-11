@@ -1,16 +1,29 @@
 package inventory
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"google.golang.org/grpc"
 	"kobe/api"
-	"kobe/pkg/redis"
+	"kobe/pkg/constant"
 	"os"
 )
 
 type Result map[string]map[string]interface{}
 
+type kobeInventoryProvider struct {
+	host string
+	port int
+}
+
+func NewKobeInventoryProvider(host string, port int) *kobeInventoryProvider {
+	return &kobeInventoryProvider{
+		host: host,
+		port: port,
+	}
+}
 func (r Result) String() string {
 	b, err := json.Marshal(&r)
 	if err != nil {
@@ -19,24 +32,30 @@ func (r Result) String() string {
 	return string(b)
 }
 
-func getInventoryFromCache(id string) (*api.Inventory, error) {
-	i, err := redis.Redis.Get(id).Result()
+func (kip kobeInventoryProvider) getInventory(id string) (*api.Inventory, error) {
+
+	conn, err := kip.createConnection()
 	if err != nil {
 		return nil, err
 	}
-	var inventory api.Inventory
-	if err := json.Unmarshal([]byte(i), &inventory); err != nil {
+	defer conn.Close()
+	client := api.NewKobeApiClient(conn)
+	request := &api.GetInventoryRequest{
+		Id: id,
+	}
+	resp, err := client.GetInventory(context.Background(), request)
+	if err != nil {
 		return nil, err
 	}
-	return &inventory, nil
+	return resp.Item, nil
 }
 
-func ListHandler() (Result, error) {
-	id, err := getInventoryIdFromEnv()
+func (kip kobeInventoryProvider) ListHandler() (Result, error) {
+	id, err := kip.getInventoryId()
 	if err != nil {
 		return nil, err
 	}
-	inventory, _ := getInventoryFromCache(id)
+	inventory, _ := kip.getInventory(id)
 	allGroup := make(map[string]map[string]interface{})
 	for _, group := range inventory.Groups {
 
@@ -73,10 +92,19 @@ func ListHandler() (Result, error) {
 	return allGroup, nil
 }
 
-func getInventoryIdFromEnv() (string, error) {
-	id := os.Getenv("inventoryId")
+func (kip kobeInventoryProvider) getInventoryId() (string, error) {
+	id := os.Getenv(constant.InventoryEnvKey)
 	if id == "" {
 		return "", errors.New(fmt.Sprintf("invalid id: %s", id))
 	}
 	return id, nil
+}
+
+func (kip kobeInventoryProvider) createConnection() (*grpc.ClientConn, error) {
+	address := fmt.Sprintf("%s:%d", kip.host, kip.port)
+	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	if err != nil {
+		return nil, err
+	}
+	return conn, nil
 }
