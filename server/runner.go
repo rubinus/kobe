@@ -4,8 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/patrickmn/go-cache"
-	uuid "github.com/satori/go.uuid"
-	"kobe/api"
 	"kobe/pkg/ansible"
 )
 
@@ -13,23 +11,19 @@ type RunnerManager struct {
 	inventoryCache *cache.Cache
 }
 
-func (rm *RunnerManager) CreatePlaybookRunner(projectName, playbookName string, inventory *api.Inventory) (*ansible.PlaybookRunner, error) {
+func (rm *RunnerManager) CreatePlaybookRunner(projectName, playbookName string) (*ansible.PlaybookRunner, error) {
 	err := preRunPlaybook(projectName, playbookName)
 	if err != nil {
 		return nil, err
 	}
-	id := uuid.NewV4().String()
-	fmt.Println("inventory" + id)
-	rm.inventoryCache.Set(id, inventory, cache.DefaultExpiration)
 	pm := ProjectManager{}
 	p, err := pm.GetProject(projectName)
 	if err != nil {
 		return nil, err
 	}
 	return &ansible.PlaybookRunner{
-		Project:     *p,
-		Playbook:    playbookName,
-		InventoryId: id,
+		Project:  *p,
+		Playbook: playbookName,
 	}, nil
 }
 

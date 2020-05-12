@@ -6,18 +6,23 @@ import (
 	"fmt"
 	"github.com/patrickmn/go-cache"
 	uuid "github.com/satori/go.uuid"
+	"io/ioutil"
 	"kobe/api"
+	"kobe/pkg/constant"
+	"path"
 	"time"
 )
 
 type Kobe struct {
 	taskCache      *cache.Cache
 	inventoryCache *cache.Cache
+	chCache        *cache.Cache
 }
 
 func NewKobe() *Kobe {
 	return &Kobe{
 		taskCache:      cache.New(24*time.Hour, 5*time.Minute),
+		chCache:        cache.New(24*time.Hour, 5*time.Minute),
 		inventoryCache: cache.New(10*time.Minute, 5*time.Minute),
 	}
 }
@@ -54,11 +59,27 @@ func (k Kobe) GetInventory(ctx context.Context, req *api.GetInventoryRequest) (*
 	return resp, nil
 }
 
-func (k Kobe) RunPlaybook(req *api.RunPlaybookRequest, server api.KobeApi_RunPlaybookServer) error {
+func (k Kobe) WatchRunPlaybook(req *api.WatchPlaybookRequest, server api.KobeApi_WatchRunPlaybookServer) error {
+	ch, found := k.chCache.Get(req.TaskId)
+	if !found {
+		return errors.New(fmt.Sprintf("can not find task: %s", req.TaskId))
+	}
+	val, ok := ch.(chan []byte)
+	if !ok {
+		return errors.New(fmt.Sprintf("invalid cache"))
+	}
+	for buf := range val {
+		_ = server.Send(&api.WatchStream{
+			Stream: buf,
+		})
+	}
+	return nil
+}
+
+func (k Kobe) RunPlaybook(ctx context.Context, req *api.RunPlaybookRequest) (*api.RunPlaybookResult, error) {
 	rm := RunnerManager{
 		inventoryCache: k.inventoryCache,
 	}
-	runner, _ := rm.CreatePlaybookRunner(req.Project, req.Playbook, req.Inventory)
 	ch := make(chan []byte)
 	id := uuid.NewV4().String()
 	result := api.Result{
@@ -69,27 +90,20 @@ func (k Kobe) RunPlaybook(req *api.RunPlaybookRequest, server api.KobeApi_RunPla
 		Success:   false,
 		Finished:  false,
 		Content:   "",
+		Project:   req.Project,
 	}
-	taskId := uuid.NewV4().String()
+	k.taskCache.Set(result.Id, &result, cache.DefaultExpiration)
+	k.chCache.Set(result.Id, ch, cache.DefaultExpiration)
+	k.inventoryCache.Set(result.Id, req.Inventory, cache.DefaultExpiration)
+	runner, _ := rm.CreatePlaybookRunner(req.Project, req.Playbook)
 	go func() {
-		k.taskCache.Set(taskId, &result, cache.DefaultExpiration)
-		fmt.Println("taskId" + taskId)
 		runner.Run(ch, &result)
-		k.taskCache.Set(taskId, &result, cache.DefaultExpiration)
+		result.Finished = true
+		k.taskCache.Set(result.Id, &result, cache.DefaultExpiration)
 	}()
-	for buf := range ch {
-		fmt.Print(string(buf))
-		_ = server.Send(&api.WatchStream{
-			Stream: buf,
-			Result: &result,
-		})
-	}
-	return nil
-}
-
-func (k Kobe) SaveResult(ctx context.Context, req *api.SaveResultRequest) (*api.SaveResultResponse, error) {
-	k.taskCache.Set(req.Item.Id, req.Item, cache.DefaultExpiration)
-	return &api.SaveResultResponse{}, nil
+	return &api.RunPlaybookResult{
+		Result: &result,
+	}, nil
 }
 
 func (k Kobe) GetResult(ctx context.Context, req *api.GetResultRequest) (*api.GetResultResponse, error) {
@@ -98,5 +112,32 @@ func (k Kobe) GetResult(ctx context.Context, req *api.GetResultRequest) (*api.Ge
 	if !found {
 		return nil, errors.New(fmt.Sprintf("can not find task: %s result", id))
 	}
-	return &api.GetResultResponse{Item: result.(*api.Result)}, nil
+	val, ok := result.(*api.Result)
+	if !ok {
+		return nil, errors.New("invalid result type")
+	}
+	if val.Finished {
+		bytes, err := ioutil.ReadFile(path.Join(constant.WorkDir, val.Project, val.Id, "result.json"))
+		if err != nil {
+			return nil, err
+		}
+		val.Content = string(bytes)
+	}
+	return &api.GetResultResponse{Item: val}, nil
+}
+
+func (k Kobe) ListResult(ctx context.Context, req *api.ListResultRequest) (*api.ListResultResponse, error) {
+	var results []*api.Result
+	resultMap := k.taskCache.Items()
+	for taskId := range resultMap {
+		item := resultMap[taskId].Object
+		val, ok := item.(*api.Result)
+		if !ok {
+			continue
+		}
+		results = append(results, val)
+	}
+	return &api.ListResultResponse{
+		Items: results,
+	}, nil
 }

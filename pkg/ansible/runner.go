@@ -15,13 +15,11 @@ import (
 const (
 	ansibleCfgFileName   = "ansible.cfg"
 	ansiblePluginDirName = "plugins"
-	resultFileName       = "result.json"
 )
 
 type PlaybookRunner struct {
-	Project     api.Project
-	Playbook    string
-	InventoryId string
+	Project  api.Project
+	Playbook string
 }
 
 func (p *PlaybookRunner) Run(ch chan []byte, result *api.Result) {
@@ -44,10 +42,8 @@ func (p *PlaybookRunner) Run(ch chan []byte, result *api.Result) {
 		"-i", constant.InventoryProviderBinPath,
 		path.Join(constant.ProjectDir, p.Project.Name, p.Playbook))
 	cmdEnv := make([]string, 0)
-	cmdEnv = append(cmdEnv, fmt.Sprintf("%s=%s", constant.InventoryEnvKey, p.InventoryId))
 	cmdEnv = append(cmdEnv, fmt.Sprintf("%s=%s", constant.TaskEnvKey, result.Id))
 	cmd.Env = append(os.Environ(), cmdEnv...)
-	fmt.Println(cmd.String())
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		result.Success = false
@@ -63,7 +59,10 @@ func (p *PlaybookRunner) Run(ch chan []byte, result *api.Result) {
 	for {
 		nr, err := stdout.Read(buf)
 		if nr > 0 {
-			ch <- buf[:nr]
+			select {
+			case ch <- buf[:nr]:
+			default:
+			}
 		}
 		if err != nil || io.EOF == err {
 			break

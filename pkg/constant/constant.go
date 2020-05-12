@@ -1,16 +1,17 @@
 package constant
 
-import "path"
+import (
+	"path"
+)
 
 const (
-	BaseDir                  = "/Users/shenchenyang/go/src/kobe/"
 	InventoryProviderBinPath = "/Users/shenchenyang/go/bin/inventory"
 	AnsiblePlaybookBinPath   = "ansible-playbook"
-	InventoryEnvKey          = "KO_INVENTORY_ID"
 	TaskEnvKey               = "KO_TASK_ID"
 )
 
 var (
+	BaseDir                 = "/Users/shenchenyang/go/src/kobe/"
 	DataDir                 = path.Join(BaseDir, "data")
 	WorkDir                 = path.Join(BaseDir, "work")
 	ProjectDir              = path.Join(DataDir, "project")

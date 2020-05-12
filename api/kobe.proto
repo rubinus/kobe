@@ -6,9 +6,10 @@ service KobeApi {
   rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse){}
   rpc ListProject(ListProjectRequest) returns(ListProjectResponse){}
   rpc GetInventory(GetInventoryRequest) returns(GetInventoryResponse){}
-  rpc RunPlaybook(RunPlaybookRequest) returns(stream WatchStream){}
-  rpc SaveResult(SaveResultRequest) returns(SaveResultResponse){}
+  rpc RunPlaybook(RunPlaybookRequest) returns(RunPlaybookResult){}
+  rpc WatchRunPlaybook(WatchPlaybookRequest) returns(stream WatchStream){}
   rpc GetResult(GetResultRequest) returns(GetResultResponse){}
+  rpc ListResult(ListResultRequest) returns(ListResultResponse){}
 }
 
 message Project{
@@ -58,6 +59,10 @@ message RunPlaybookRequest {
   Inventory inventory = 3;
 }
 
+message RunPlaybookResult {
+  Result result = 1;
+}
+
 message Result {
   string id = 1;
   string startTime = 2;
@@ -66,11 +71,15 @@ message Result {
   bool success = 5;
   bool finished = 6;
   string content = 7;
+  string project = 8;
 }
 
 message WatchStream {
   bytes stream = 1;
-  Result result = 2;
+}
+
+message WatchPlaybookRequest{
+  string taskId = 1;
 }
 
 message GetInventoryRequest {
@@ -81,14 +90,6 @@ message GetInventoryResponse {
   Inventory item = 1;
 }
 
-message SaveResultRequest{
-  Result item = 1;
-}
-
-message SaveResultResponse{
-  Result item = 1;
-}
-
 message GetResultRequest{
   string taskId = 1;
 }
@@ -96,4 +97,12 @@ message GetResultRequest{
 message GetResultResponse{
   Result item = 1;
 }
+
+message ListResultRequest{
+}
+
+message ListResultResponse{
+  repeated Result items = 1;
+}
+
 

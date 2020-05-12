@@ -1,16 +1,8 @@
-# (c) 2016, Matt Martz <matt@sivel.net>
-# (c) 2017 Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-
-# Make coding more python3-ish
 from __future__ import (absolute_import, division, print_function)
 
 __metaclass__ = type
 
 import os
-
-import grpc
-from ansible.parsing.ajson import AnsibleJSONEncoder
 
 DOCUMENTATION = '''
     callback: json
@@ -41,8 +33,8 @@ import json
 from functools import partial
 
 from ansible.inventory.host import Host
+from ansible.parsing.ajson import AnsibleJSONEncoder
 from ansible.plugins.callback import CallbackBase
-from plugins.callback.kobe import kobe_pb2, kobe_pb2_grpc
 
 
 def current_time():
@@ -51,7 +43,7 @@ def current_time():
 
 class CallbackModule(CallbackBase):
     CALLBACK_VERSION = 2.0
-    CALLBACK_TYPE = 'stdout'
+    CALLBACK_TYPE = 'notification'
     CALLBACK_NAME = 'result'
 
     def __init__(self, display=None):
@@ -119,9 +111,12 @@ class CallbackModule(CallbackBase):
             'custom_stats': custom_stats,
             'global_custom_stats': global_custom_stats,
         }
-        id = os.getenv("KO_TASK_ID")
-        result_content = json.dumps(output, cls=AnsibleJSONEncoder, indent=4, sort_keys=True)
-        self._save_task_result(id, result_content)
+
+        task_id = os.getenv("KO_TASK_ID")
+        os.makedirs(task_id, 0o755, True)
+        result_path = os.path.join(task_id, "result.json")
+        with open(result_path, "w") as f:
+            f.write(json.dumps(output, cls=AnsibleJSONEncoder, indent=4, sort_keys=True))
 
     def _record_task_result(self, on_info, result, **kwargs):
         """This function is used as a partial to add failed/skipped info in a single method"""
@@ -147,23 +142,3 @@ class CallbackModule(CallbackBase):
             on_info[on] = True
 
         return partial(self._record_task_result, on_info)
-
-    def _get_task_result(self, id):
-        conn = grpc.insecure_channel("127.0.0.1:8080")
-        client = kobe_pb2_grpc.KobeApiStub(channel=conn)
-        request = kobe_pb2.GetResultRequest(
-            taskId=id
-        )
-        response = client.GetResult(request)
-        return response.item
-
-    def _save_task_result(self, id, content):
-        _result = self._get_task_result(id)
-        _result.content = content
-        conn = grpc.insecure_channel("127.0.0.1:8080")
-        client = kobe_pb2_grpc.KobeApiStub(channel=conn)
-        request = kobe_pb2.SaveResultRequest(
-            item=_result
-        )
-        response = client.SaveResult(request)
-        return response

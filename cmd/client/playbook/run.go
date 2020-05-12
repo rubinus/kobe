@@ -3,6 +3,8 @@ package playbook
 import (
 	"fmt"
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
 	"kobe/api"
 	"kobe/client"
 	"log"
@@ -17,38 +19,45 @@ var playbookRunCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
+		inventoryPath, err := cmd.Flags().GetString("inventory")
+		if err != nil {
+			log.Fatal(err)
+		}
+		content, err := ioutil.ReadFile(inventoryPath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		var inventory api.Inventory
+		err = yaml.Unmarshal(content, &inventory)
+		if err != nil {
+			log.Fatal(err)
+		}
 		if len(args) < 1 {
 			log.Fatal("invalid playbook name")
 		}
 		playbook := args[0]
-		var result api.Result
-		i := api.Inventory{
-			Hosts: []*api.Host{
-				{
-					Name:     "test",
-					Ip:       "172.16.10.63",
-					Port:     22,
-					User:     "root",
-					Password: "Calong@2015",
-					Vars:     map[string]string{},
-				},
-			},
-			Groups: []*api.Group{
-				{
-					Name:     "master",
-					Children: []string{},
-					Hosts:    []string{"test"},
-				},
-			},
-		}
-		err = c.RunPlaybook(project, playbook, i, os.Stdout, &result)
-		fmt.Print(result.Success)
+		result, err := c.RunPlaybook(project, playbook, inventory)
 		if err != nil {
 			log.Fatal(err)
 		}
+		backend, err := cmd.Flags().GetBool("b")
+		if err != nil {
+			log.Fatal(err)
+		}
+		if backend {
+			fmt.Println(result.Id)
+		} else {
+			err := c.WatchRunPlaybook(result.Id, os.Stdout)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+
 	},
 }
 
 func init() {
 	playbookRunCmd.Flags().StringP("project", "p", "", "")
+	playbookRunCmd.Flags().BoolP("b", "b", false, "")
+	playbookRunCmd.Flags().StringP("inventory", "i", "", "")
 }

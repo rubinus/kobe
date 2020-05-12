@@ -471,6 +471,45 @@ func (m *RunPlaybookRequest) GetInventory() *Inventory {
 	return nil
 }
 
+type RunPlaybookResult struct {
+	Result               *Result  `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *RunPlaybookResult) Reset()         { *m = RunPlaybookResult{} }
+func (m *RunPlaybookResult) String() string { return proto.CompactTextString(m) }
+func (*RunPlaybookResult) ProtoMessage()    {}
+func (*RunPlaybookResult) Descriptor() ([]byte, []int) {
+	return fileDescriptor_77244b2e22c40370, []int{9}
+}
+
+func (m *RunPlaybookResult) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_RunPlaybookResult.Unmarshal(m, b)
+}
+func (m *RunPlaybookResult) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_RunPlaybookResult.Marshal(b, m, deterministic)
+}
+func (m *RunPlaybookResult) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RunPlaybookResult.Merge(m, src)
+}
+func (m *RunPlaybookResult) XXX_Size() int {
+	return xxx_messageInfo_RunPlaybookResult.Size(m)
+}
+func (m *RunPlaybookResult) XXX_DiscardUnknown() {
+	xxx_messageInfo_RunPlaybookResult.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_RunPlaybookResult proto.InternalMessageInfo
+
+func (m *RunPlaybookResult) GetResult() *Result {
+	if m != nil {
+		return m.Result
+	}
+	return nil
+}
+
 type Result struct {
 	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	StartTime            string   `protobuf:"bytes,2,opt,name=startTime,proto3" json:"startTime,omitempty"`
@@ -479,6 +518,7 @@ type Result struct {
 	Success              bool     `protobuf:"varint,5,opt,name=success,proto3" json:"success,omitempty"`
 	Finished             bool     `protobuf:"varint,6,opt,name=finished,proto3" json:"finished,omitempty"`
 	Content              string   `protobuf:"bytes,7,opt,name=content,proto3" json:"content,omitempty"`
+	Project              string   `protobuf:"bytes,8,opt,name=project,proto3" json:"project,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -488,7 +528,7 @@ func (m *Result) Reset()         { *m = Result{} }
 func (m *Result) String() string { return proto.CompactTextString(m) }
 func (*Result) ProtoMessage()    {}
 func (*Result) Descriptor() ([]byte, []int) {
-	return fileDescriptor_77244b2e22c40370, []int{9}
+	return fileDescriptor_77244b2e22c40370, []int{10}
 }
 
 func (m *Result) XXX_Unmarshal(b []byte) error {
@@ -558,9 +598,15 @@ func (m *Result) GetContent() string {
 	return ""
 }
 
+func (m *Result) GetProject() string {
+	if m != nil {
+		return m.Project
+	}
+	return ""
+}
+
 type WatchStream struct {
 	Stream               []byte   `protobuf:"bytes,1,opt,name=stream,proto3" json:"stream,omitempty"`
-	Result               *Result  `protobuf:"bytes,2,opt,name=result,proto3" json:"result,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -570,7 +616,7 @@ func (m *WatchStream) Reset()         { *m = WatchStream{} }
 func (m *WatchStream) String() string { return proto.CompactTextString(m) }
 func (*WatchStream) ProtoMessage()    {}
 func (*WatchStream) Descriptor() ([]byte, []int) {
-	return fileDescriptor_77244b2e22c40370, []int{10}
+	return fileDescriptor_77244b2e22c40370, []int{11}
 }
 
 func (m *WatchStream) XXX_Unmarshal(b []byte) error {
@@ -598,11 +644,43 @@ func (m *WatchStream) GetStream() []byte {
 	return nil
 }
 
-func (m *WatchStream) GetResult() *Result {
+type WatchPlaybookRequest struct {
+	TaskId               string   `protobuf:"bytes,1,opt,name=taskId,proto3" json:"taskId,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *WatchPlaybookRequest) Reset()         { *m = WatchPlaybookRequest{} }
+func (m *WatchPlaybookRequest) String() string { return proto.CompactTextString(m) }
+func (*WatchPlaybookRequest) ProtoMessage()    {}
+func (*WatchPlaybookRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_77244b2e22c40370, []int{12}
+}
+
+func (m *WatchPlaybookRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_WatchPlaybookRequest.Unmarshal(m, b)
+}
+func (m *WatchPlaybookRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_WatchPlaybookRequest.Marshal(b, m, deterministic)
+}
+func (m *WatchPlaybookRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_WatchPlaybookRequest.Merge(m, src)
+}
+func (m *WatchPlaybookRequest) XXX_Size() int {
+	return xxx_messageInfo_WatchPlaybookRequest.Size(m)
+}
+func (m *WatchPlaybookRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_WatchPlaybookRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_WatchPlaybookRequest proto.InternalMessageInfo
+
+func (m *WatchPlaybookRequest) GetTaskId() string {
 	if m != nil {
-		return m.Result
+		return m.TaskId
 	}
-	return nil
+	return ""
 }
 
 type GetInventoryRequest struct {
@@ -616,7 +694,7 @@ func (m *GetInventoryRequest) Reset()         { *m = GetInventoryRequest{} }
 func (m *GetInventoryRequest) String() string { return proto.CompactTextString(m) }
 func (*GetInventoryRequest) ProtoMessage()    {}
 func (*GetInventoryRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_77244b2e22c40370, []int{11}
+	return fileDescriptor_77244b2e22c40370, []int{13}
 }
 
 func (m *GetInventoryRequest) XXX_Unmarshal(b []byte) error {
@@ -655,7 +733,7 @@ func (m *GetInventoryResponse) Reset()         { *m = GetInventoryResponse{} }
 func (m *GetInventoryResponse) String() string { return proto.CompactTextString(m) }
 func (*GetInventoryResponse) ProtoMessage()    {}
 func (*GetInventoryResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_77244b2e22c40370, []int{12}
+	return fileDescriptor_77244b2e22c40370, []int{14}
 }
 
 func (m *GetInventoryResponse) XXX_Unmarshal(b []byte) error {
@@ -677,84 +755,6 @@ func (m *GetInventoryResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_GetInventoryResponse proto.InternalMessageInfo
 
 func (m *GetInventoryResponse) GetItem() *Inventory {
-	if m != nil {
-		return m.Item
-	}
-	return nil
-}
-
-type SaveResultRequest struct {
-	Item                 *Result  `protobuf:"bytes,1,opt,name=item,proto3" json:"item,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *SaveResultRequest) Reset()         { *m = SaveResultRequest{} }
-func (m *SaveResultRequest) String() string { return proto.CompactTextString(m) }
-func (*SaveResultRequest) ProtoMessage()    {}
-func (*SaveResultRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_77244b2e22c40370, []int{13}
-}
-
-func (m *SaveResultRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_SaveResultRequest.Unmarshal(m, b)
-}
-func (m *SaveResultRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_SaveResultRequest.Marshal(b, m, deterministic)
-}
-func (m *SaveResultRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SaveResultRequest.Merge(m, src)
-}
-func (m *SaveResultRequest) XXX_Size() int {
-	return xxx_messageInfo_SaveResultRequest.Size(m)
-}
-func (m *SaveResultRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_SaveResultRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_SaveResultRequest proto.InternalMessageInfo
-
-func (m *SaveResultRequest) GetItem() *Result {
-	if m != nil {
-		return m.Item
-	}
-	return nil
-}
-
-type SaveResultResponse struct {
-	Item                 *Result  `protobuf:"bytes,1,opt,name=item,proto3" json:"item,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *SaveResultResponse) Reset()         { *m = SaveResultResponse{} }
-func (m *SaveResultResponse) String() string { return proto.CompactTextString(m) }
-func (*SaveResultResponse) ProtoMessage()    {}
-func (*SaveResultResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_77244b2e22c40370, []int{14}
-}
-
-func (m *SaveResultResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_SaveResultResponse.Unmarshal(m, b)
-}
-func (m *SaveResultResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_SaveResultResponse.Marshal(b, m, deterministic)
-}
-func (m *SaveResultResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SaveResultResponse.Merge(m, src)
-}
-func (m *SaveResultResponse) XXX_Size() int {
-	return xxx_messageInfo_SaveResultResponse.Size(m)
-}
-func (m *SaveResultResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_SaveResultResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_SaveResultResponse proto.InternalMessageInfo
-
-func (m *SaveResultResponse) GetItem() *Result {
 	if m != nil {
 		return m.Item
 	}
@@ -839,6 +839,76 @@ func (m *GetResultResponse) GetItem() *Result {
 	return nil
 }
 
+type ListResultRequest struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ListResultRequest) Reset()         { *m = ListResultRequest{} }
+func (m *ListResultRequest) String() string { return proto.CompactTextString(m) }
+func (*ListResultRequest) ProtoMessage()    {}
+func (*ListResultRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_77244b2e22c40370, []int{17}
+}
+
+func (m *ListResultRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListResultRequest.Unmarshal(m, b)
+}
+func (m *ListResultRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListResultRequest.Marshal(b, m, deterministic)
+}
+func (m *ListResultRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListResultRequest.Merge(m, src)
+}
+func (m *ListResultRequest) XXX_Size() int {
+	return xxx_messageInfo_ListResultRequest.Size(m)
+}
+func (m *ListResultRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListResultRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListResultRequest proto.InternalMessageInfo
+
+type ListResultResponse struct {
+	Items                []*Result `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
+	XXX_unrecognized     []byte    `json:"-"`
+	XXX_sizecache        int32     `json:"-"`
+}
+
+func (m *ListResultResponse) Reset()         { *m = ListResultResponse{} }
+func (m *ListResultResponse) String() string { return proto.CompactTextString(m) }
+func (*ListResultResponse) ProtoMessage()    {}
+func (*ListResultResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_77244b2e22c40370, []int{18}
+}
+
+func (m *ListResultResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListResultResponse.Unmarshal(m, b)
+}
+func (m *ListResultResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListResultResponse.Marshal(b, m, deterministic)
+}
+func (m *ListResultResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListResultResponse.Merge(m, src)
+}
+func (m *ListResultResponse) XXX_Size() int {
+	return xxx_messageInfo_ListResultResponse.Size(m)
+}
+func (m *ListResultResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListResultResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListResultResponse proto.InternalMessageInfo
+
+func (m *ListResultResponse) GetItems() []*Result {
+	if m != nil {
+		return m.Items
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*Project)(nil), "api.Project")
 	proto.RegisterType((*Host)(nil), "api.Host")
@@ -851,67 +921,72 @@ func init() {
 	proto.RegisterType((*ListProjectRequest)(nil), "api.ListProjectRequest")
 	proto.RegisterType((*ListProjectResponse)(nil), "api.ListProjectResponse")
 	proto.RegisterType((*RunPlaybookRequest)(nil), "api.RunPlaybookRequest")
+	proto.RegisterType((*RunPlaybookResult)(nil), "api.RunPlaybookResult")
 	proto.RegisterType((*Result)(nil), "api.Result")
 	proto.RegisterType((*WatchStream)(nil), "api.WatchStream")
+	proto.RegisterType((*WatchPlaybookRequest)(nil), "api.WatchPlaybookRequest")
 	proto.RegisterType((*GetInventoryRequest)(nil), "api.GetInventoryRequest")
 	proto.RegisterType((*GetInventoryResponse)(nil), "api.GetInventoryResponse")
-	proto.RegisterType((*SaveResultRequest)(nil), "api.SaveResultRequest")
-	proto.RegisterType((*SaveResultResponse)(nil), "api.SaveResultResponse")
 	proto.RegisterType((*GetResultRequest)(nil), "api.GetResultRequest")
 	proto.RegisterType((*GetResultResponse)(nil), "api.GetResultResponse")
+	proto.RegisterType((*ListResultRequest)(nil), "api.ListResultRequest")
+	proto.RegisterType((*ListResultResponse)(nil), "api.ListResultResponse")
 }
 
 func init() { proto.RegisterFile("kobe.proto", fileDescriptor_77244b2e22c40370) }
 
 var fileDescriptor_77244b2e22c40370 = []byte{
-	// 747 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x55, 0xdf, 0x6e, 0xd3, 0x3a,
-	0x18, 0x5f, 0x9a, 0x36, 0x5d, 0xbe, 0xec, 0x4c, 0x3b, 0x5e, 0xd7, 0x65, 0xd1, 0x91, 0x56, 0xf9,
-	0x08, 0x51, 0x21, 0x54, 0xa1, 0x02, 0x82, 0x0d, 0x24, 0xc4, 0xd0, 0xb4, 0x0d, 0xb8, 0x98, 0x32,
-	0x04, 0xd7, 0x6e, 0x6b, 0xd6, 0xd0, 0x36, 0x0e, 0xb6, 0x53, 0xe8, 0xb3, 0xf0, 0x12, 0x5c, 0xf3,
-	0x14, 0x3c, 0x12, 0x8a, 0x63, 0xa7, 0x49, 0x5b, 0x09, 0x2e, 0xb8, 0xf3, 0xef, 0xfb, 0xfb, 0xfb,
-	0xfe, 0xc9, 0x00, 0x13, 0x36, 0xa0, 0xbd, 0x84, 0x33, 0xc9, 0x90, 0x4d, 0x92, 0x08, 0x3f, 0x83,
-	0xe6, 0x35, 0x67, 0x9f, 0xe8, 0x50, 0x22, 0x04, 0xf5, 0x98, 0xcc, 0xa8, 0x6f, 0x75, 0xac, 0xae,
-	0x1b, 0xaa, 0x37, 0xfa, 0x0f, 0xdc, 0x64, 0x4a, 0x16, 0x03, 0xc6, 0x26, 0xc2, 0xaf, 0x75, 0xec,
-	0xae, 0x1b, 0x2e, 0x05, 0xf8, 0xa7, 0x05, 0xf5, 0x4b, 0x26, 0x24, 0xda, 0x85, 0x5a, 0x94, 0x68,
-	0xc7, 0x5a, 0x94, 0x14, 0xa1, 0x6a, 0xa5, 0x50, 0x08, 0xea, 0x09, 0xe3, 0xd2, 0xb7, 0x3b, 0x56,
-	0xb7, 0x11, 0xaa, 0x77, 0x26, 0x4b, 0x05, 0xe5, 0x7e, 0x3d, 0xb7, 0xcb, 0xde, 0x28, 0x80, 0xed,
-	0x84, 0x08, 0xf1, 0x85, 0xf1, 0x91, 0xdf, 0x50, 0xf2, 0x02, 0xa3, 0xbb, 0x50, 0x9f, 0x13, 0x2e,
-	0x7c, 0xa7, 0x63, 0x77, 0xbd, 0xfe, 0x7e, 0x8f, 0x24, 0x51, 0x2f, 0x23, 0xd0, 0x7b, 0x4f, 0xb8,
-	0x38, 0x8f, 0x25, 0x5f, 0x84, 0xca, 0x20, 0x78, 0x02, 0x6e, 0x21, 0x42, 0x7b, 0x60, 0x4f, 0xe8,
-	0x42, 0xd3, 0xcb, 0x9e, 0xa8, 0x05, 0x8d, 0x39, 0x99, 0xa6, 0x86, 0x60, 0x0e, 0x4e, 0x6b, 0x4f,
-	0x2d, 0xfc, 0xdd, 0x82, 0xc6, 0x05, 0x67, 0x69, 0xb2, 0xb1, 0x1d, 0x2d, 0x68, 0x8c, 0x99, 0x90,
-	0xa6, 0x15, 0x39, 0xc8, 0x18, 0x0f, 0xc7, 0xd1, 0x74, 0xc4, 0x69, 0xec, 0xdb, 0x4a, 0x51, 0x60,
-	0xd4, 0xd5, 0x8c, 0xeb, 0x8a, 0x71, 0x4b, 0x31, 0x56, 0xf1, 0xff, 0x1e, 0xe5, 0x6b, 0x70, 0xaf,
-	0xe2, 0x39, 0x8d, 0x25, 0xe3, 0x0b, 0x74, 0x6c, 0x18, 0x5a, 0x2a, 0xa1, 0x5b, 0xb4, 0xc8, 0x90,
-	0xc5, 0xe0, 0xdc, 0x66, 0xf9, 0xf3, 0x1a, 0xbc, 0x3e, 0x2c, 0x29, 0x85, 0x5a, 0x83, 0xcf, 0xa0,
-	0xf5, 0x8a, 0x53, 0x22, 0xa9, 0x5e, 0x8d, 0x90, 0x7e, 0x4e, 0xa9, 0xd8, 0xbc, 0x21, 0x6d, 0x70,
-	0x04, 0x4b, 0xf9, 0xd0, 0x10, 0xd3, 0x08, 0x9f, 0xc0, 0xc1, 0x4a, 0x0c, 0x91, 0xb0, 0x58, 0x50,
-	0xd4, 0x81, 0x7a, 0x24, 0xe9, 0x4c, 0x05, 0xf1, 0xfa, 0x3b, 0x2a, 0xbd, 0xb1, 0x51, 0x1a, 0xdc,
-	0x02, 0xf4, 0x36, 0x12, 0xb2, 0x9a, 0x1c, 0x9f, 0xc0, 0x7e, 0x45, 0xaa, 0xc3, 0x61, 0x68, 0x64,
-	0x4e, 0xa6, 0xe0, 0x6a, 0xbc, 0x5c, 0x85, 0xbf, 0x02, 0x0a, 0xd3, 0xf8, 0x5a, 0xef, 0xad, 0xa9,
-	0xc6, 0x87, 0x66, 0x92, 0xdb, 0xe9, 0x82, 0x0c, 0x54, 0x2b, 0xa8, 0x8d, 0x75, 0x55, 0x05, 0x46,
-	0xf7, 0xc1, 0x8d, 0x4c, 0xb7, 0xd5, 0x2e, 0x7b, 0xfd, 0x5d, 0x95, 0xb3, 0x98, 0x41, 0xb8, 0x34,
-	0xc0, 0x3f, 0x2c, 0x70, 0x42, 0x2a, 0xd2, 0x69, 0x7e, 0x23, 0xa3, 0xe2, 0x46, 0x46, 0xd9, 0x69,
-	0x09, 0x49, 0xb8, 0x7c, 0x17, 0x15, 0x87, 0xb2, 0x14, 0x64, 0xe4, 0x68, 0x3c, 0x52, 0x3a, 0x3b,
-	0x27, 0xa7, 0x61, 0xa6, 0x99, 0x51, 0x21, 0xc8, 0x2d, 0xd5, 0x67, 0x63, 0x60, 0xa6, 0x11, 0xe9,
-	0x70, 0x48, 0x85, 0x50, 0x87, 0xb3, 0x1d, 0x1a, 0x98, 0x15, 0xf4, 0x31, 0x8a, 0x23, 0x31, 0xa6,
-	0x23, 0xdf, 0x51, 0xaa, 0x02, 0x67, 0x5e, 0x43, 0x16, 0x4b, 0x1a, 0x4b, 0xbf, 0x99, 0xc7, 0xd3,
-	0x10, 0xbf, 0x06, 0xef, 0x03, 0x91, 0xc3, 0xf1, 0x8d, 0xe4, 0x94, 0xcc, 0xd4, 0xa4, 0xd5, 0x4b,
-	0x15, 0xb1, 0x13, 0x6a, 0x84, 0xfe, 0x07, 0x87, 0xab, 0x12, 0x55, 0x15, 0x5e, 0xdf, 0x53, 0xed,
-	0xc8, 0xab, 0x0e, 0xb5, 0x0a, 0xdf, 0x81, 0xfd, 0x0b, 0x2a, 0x97, 0x3d, 0xd2, 0x33, 0x58, 0x69,
-	0x0a, 0x3e, 0x85, 0x56, 0xd5, 0xac, 0x98, 0x72, 0x79, 0x69, 0x56, 0x1b, 0x9e, 0xaf, 0xcd, 0x23,
-	0xf8, 0xf7, 0x86, 0xcc, 0xa9, 0x4e, 0xac, 0x13, 0x1c, 0x57, 0x1c, 0x2b, 0xd4, 0x72, 0xaf, 0xc7,
-	0x80, 0xca, 0x5e, 0x3a, 0xdf, 0x6f, 0xdd, 0xee, 0xc1, 0xde, 0x05, 0x95, 0xd5, 0x5c, 0x6d, 0x70,
-	0x24, 0x11, 0x93, 0x2b, 0x53, 0x90, 0x46, 0x19, 0xb1, 0x92, 0xed, 0x1f, 0x66, 0xe8, 0x7f, 0xb3,
-	0xa1, 0xf9, 0x86, 0x0d, 0xe8, 0xcb, 0x24, 0x42, 0x97, 0xf0, 0x4f, 0xe5, 0x98, 0xd0, 0x91, 0xb2,
-	0xdf, 0x74, 0xa4, 0x41, 0xb0, 0x49, 0x95, 0x27, 0xc5, 0x5b, 0xe8, 0x0c, 0xbc, 0xd2, 0x15, 0xa1,
-	0x43, 0x65, 0xbc, 0x7e, 0x6d, 0x81, 0xbf, 0xae, 0x28, 0x62, 0x9c, 0xc3, 0x4e, 0x79, 0x48, 0x28,
-	0xb7, 0xdd, 0x30, 0xde, 0xe0, 0x68, 0x83, 0xa6, 0x08, 0xf3, 0x1c, 0xbc, 0xd2, 0x55, 0x6a, 0x2a,
-	0xeb, 0x77, 0x1a, 0xec, 0x29, 0x45, 0x69, 0x13, 0xf1, 0xd6, 0x03, 0x0b, 0xbd, 0x00, 0x58, 0xce,
-	0x0d, 0xb5, 0x95, 0xcd, 0xda, 0xf8, 0x83, 0xc3, 0x35, 0x79, 0x29, 0xbd, 0x5b, 0x4c, 0x05, 0x1d,
-	0x18, 0xa2, 0x55, 0xf7, 0xf6, 0xaa, 0xd8, 0x78, 0x0f, 0x1c, 0xf5, 0x87, 0x3e, 0xfc, 0x15, 0x00,
-	0x00, 0xff, 0xff, 0x47, 0xbb, 0x74, 0x75, 0x51, 0x07, 0x00, 0x00,
+	// 791 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x55, 0xdd, 0x6e, 0xd3, 0x4c,
+	0x10, 0x8d, 0xe3, 0xc4, 0xa9, 0xc7, 0xfd, 0xaa, 0x74, 0x93, 0xa6, 0xae, 0xf5, 0x49, 0x0d, 0x8b,
+	0x2a, 0x22, 0x84, 0x22, 0x14, 0x90, 0xfa, 0x03, 0x12, 0xd0, 0xaa, 0x6a, 0x2b, 0xb8, 0xa8, 0x0c,
+	0x82, 0x6b, 0x27, 0x59, 0x1a, 0x93, 0xc4, 0x6b, 0x76, 0xd7, 0x85, 0xbc, 0x15, 0x8f, 0xc2, 0x05,
+	0x8f, 0xc0, 0x83, 0x20, 0xef, 0xae, 0x1d, 0x3b, 0x89, 0xc4, 0x0d, 0x77, 0x9e, 0x39, 0xb3, 0x33,
+	0x67, 0x66, 0xce, 0xc8, 0x00, 0x53, 0x3a, 0x24, 0xfd, 0x98, 0x51, 0x41, 0x91, 0x19, 0xc4, 0x21,
+	0x7e, 0x01, 0x8d, 0x5b, 0x46, 0xbf, 0x90, 0x91, 0x40, 0x08, 0x6a, 0x51, 0x30, 0x27, 0xae, 0xd1,
+	0x35, 0x7a, 0xb6, 0x2f, 0xbf, 0xd1, 0xff, 0x60, 0xc7, 0xb3, 0x60, 0x31, 0xa4, 0x74, 0xca, 0xdd,
+	0x6a, 0xd7, 0xec, 0xd9, 0xfe, 0xd2, 0x81, 0x7f, 0x1a, 0x50, 0xbb, 0xa6, 0x5c, 0xa0, 0x1d, 0xa8,
+	0x86, 0xb1, 0x7e, 0x58, 0x0d, 0xe3, 0x3c, 0x55, 0xb5, 0x90, 0x0a, 0x41, 0x2d, 0xa6, 0x4c, 0xb8,
+	0x66, 0xd7, 0xe8, 0xd5, 0x7d, 0xf9, 0x9d, 0xfa, 0x12, 0x4e, 0x98, 0x5b, 0x53, 0x71, 0xe9, 0x37,
+	0xf2, 0x60, 0x2b, 0x0e, 0x38, 0xff, 0x46, 0xd9, 0xd8, 0xad, 0x4b, 0x7f, 0x6e, 0xa3, 0x47, 0x50,
+	0xbb, 0x0f, 0x18, 0x77, 0xad, 0xae, 0xd9, 0x73, 0x06, 0xad, 0x7e, 0x10, 0x87, 0xfd, 0x94, 0x40,
+	0xff, 0x63, 0xc0, 0xf8, 0x65, 0x24, 0xd8, 0xc2, 0x97, 0x01, 0xde, 0x31, 0xd8, 0xb9, 0x0b, 0x35,
+	0xc1, 0x9c, 0x92, 0x85, 0xa6, 0x97, 0x7e, 0xa2, 0x36, 0xd4, 0xef, 0x83, 0x59, 0x92, 0x11, 0x54,
+	0xc6, 0x59, 0xf5, 0xc4, 0xc0, 0x3f, 0x0c, 0xa8, 0x5f, 0x31, 0x9a, 0xc4, 0x1b, 0xc7, 0xd1, 0x86,
+	0xfa, 0x84, 0x72, 0x91, 0x8d, 0x42, 0x19, 0x29, 0xe3, 0xd1, 0x24, 0x9c, 0x8d, 0x19, 0x89, 0x5c,
+	0x53, 0x02, 0xb9, 0x8d, 0x7a, 0x9a, 0x71, 0x4d, 0x32, 0x6e, 0x4b, 0xc6, 0x32, 0xff, 0xbf, 0xa3,
+	0x7c, 0x0b, 0xf6, 0x4d, 0x74, 0x4f, 0x22, 0x41, 0xd9, 0x02, 0x1d, 0x66, 0x0c, 0x0d, 0x59, 0xd0,
+	0xce, 0x47, 0x94, 0x91, 0xc5, 0x60, 0xdd, 0xa5, 0xf5, 0x55, 0x0f, 0xce, 0x00, 0x96, 0x94, 0x7c,
+	0x8d, 0xe0, 0x73, 0x68, 0x5f, 0x30, 0x12, 0x08, 0xa2, 0xa5, 0xe1, 0x93, 0xaf, 0x09, 0xe1, 0x9b,
+	0x15, 0xd2, 0x01, 0x8b, 0xd3, 0x84, 0x8d, 0x32, 0x62, 0xda, 0xc2, 0xa7, 0xb0, 0xb7, 0x92, 0x83,
+	0xc7, 0x34, 0xe2, 0x04, 0x75, 0xa1, 0x16, 0x0a, 0x32, 0x97, 0x49, 0x9c, 0xc1, 0xb6, 0x2c, 0x9f,
+	0xc5, 0x48, 0x04, 0xb7, 0x01, 0xbd, 0x0b, 0xb9, 0x28, 0x17, 0xc7, 0xa7, 0xd0, 0x2a, 0x79, 0x75,
+	0x3a, 0x0c, 0xf5, 0xf4, 0x51, 0xd6, 0x70, 0x39, 0x9f, 0x82, 0xf0, 0x77, 0x40, 0x7e, 0x12, 0xdd,
+	0x6a, 0xdd, 0x66, 0xdd, 0xb8, 0xd0, 0x88, 0x55, 0x9c, 0x6e, 0x28, 0x33, 0xa5, 0x04, 0x75, 0xb0,
+	0xee, 0x2a, 0xb7, 0xd1, 0x13, 0xb0, 0xc3, 0x6c, 0xda, 0x52, 0xcb, 0xce, 0x60, 0x47, 0xd6, 0xcc,
+	0x77, 0xe0, 0x2f, 0x03, 0xf0, 0x09, 0xec, 0x96, 0x2a, 0xf3, 0x64, 0x26, 0xd0, 0x43, 0xb0, 0x98,
+	0xfc, 0xd2, 0x33, 0x70, 0xe4, 0x7b, 0x05, 0xfa, 0x1a, 0xc2, 0xbf, 0x0c, 0xb0, 0x74, 0x7c, 0x7a,
+	0x5d, 0xe3, 0xfc, 0xba, 0xc6, 0xe9, 0x51, 0x72, 0x11, 0x30, 0xf1, 0x21, 0xcc, 0x4f, 0x6c, 0xe9,
+	0x48, 0xdb, 0x22, 0xd1, 0x58, 0x62, 0xa6, 0x6a, 0x4b, 0x9b, 0x29, 0x32, 0x27, 0x9c, 0x07, 0x77,
+	0x44, 0x1f, 0x5c, 0x66, 0xa6, 0x08, 0x4f, 0x46, 0x23, 0xc2, 0xb9, 0x3c, 0xb9, 0x2d, 0x3f, 0x33,
+	0xd3, 0x51, 0x7c, 0x0e, 0xa3, 0x90, 0x4f, 0xc8, 0xd8, 0xb5, 0x24, 0x94, 0xdb, 0xe9, 0xab, 0x11,
+	0x8d, 0x04, 0x89, 0x84, 0xdb, 0x50, 0xf9, 0xb4, 0x59, 0x1c, 0xed, 0x56, 0x69, 0xb4, 0xf8, 0x08,
+	0x9c, 0x4f, 0x81, 0x18, 0x4d, 0xde, 0x0b, 0x46, 0x82, 0xb9, 0x54, 0x8f, 0xfc, 0x92, 0xed, 0x6d,
+	0xfb, 0xda, 0xc2, 0x7d, 0x68, 0xcb, 0xb0, 0xd5, 0x9d, 0x75, 0xc0, 0x12, 0x01, 0x9f, 0xde, 0x64,
+	0xe3, 0xd0, 0x16, 0x3e, 0x82, 0xd6, 0x15, 0x11, 0xcb, 0x15, 0xe8, 0xf0, 0x95, 0xc9, 0xe1, 0x33,
+	0x68, 0x97, 0xc3, 0x72, 0x11, 0x15, 0x35, 0xb9, 0xba, 0x4f, 0xa5, 0xca, 0xc7, 0xd0, 0xbc, 0x22,
+	0x42, 0x6f, 0xe9, 0x2f, 0x74, 0x9e, 0xc3, 0x6e, 0x21, 0x56, 0x17, 0x39, 0x2c, 0x15, 0x29, 0x2d,
+	0x5d, 0x55, 0x68, 0xc1, 0x6e, 0xaa, 0xf0, 0x52, 0x09, 0x7c, 0xac, 0x8e, 0x61, 0x25, 0xd7, 0x83,
+	0xb2, 0xea, 0x4b, 0xc9, 0x14, 0x32, 0xf8, 0x6d, 0x42, 0xe3, 0x2d, 0x1d, 0x92, 0x37, 0x71, 0x88,
+	0xae, 0xe1, 0xbf, 0xd2, 0x31, 0xa2, 0x03, 0xf9, 0x60, 0xd3, 0x91, 0x7b, 0xde, 0x26, 0x48, 0x95,
+	0xc5, 0x15, 0x74, 0x0e, 0x4e, 0xe1, 0x0a, 0xd1, 0xbe, 0x0c, 0x5e, 0xbf, 0x56, 0xcf, 0x5d, 0x07,
+	0xf2, 0x1c, 0x97, 0xb0, 0x5d, 0xdc, 0x02, 0x52, 0xb1, 0x1b, 0xf6, 0xe7, 0x1d, 0x6c, 0x40, 0xf2,
+	0x34, 0xaf, 0xc1, 0x29, 0xdc, 0x96, 0xa6, 0xb2, 0x7e, 0xe7, 0x5e, 0x67, 0x1d, 0x90, 0x17, 0x56,
+	0x41, 0x17, 0xd0, 0x94, 0x2a, 0x2b, 0xa6, 0x51, 0x25, 0x37, 0x89, 0xcf, 0x6b, 0x2e, 0x21, 0x25,
+	0x5f, 0x5c, 0x79, 0x6a, 0xa0, 0x97, 0x60, 0xe7, 0xbb, 0x46, 0x7b, 0x19, 0xe1, 0xd2, 0x12, 0x35,
+	0x85, 0x35, 0x49, 0xe0, 0x0a, 0x7a, 0x05, 0xb0, 0x5c, 0x2f, 0xea, 0xe4, 0x53, 0x2b, 0xbf, 0xdf,
+	0x5f, 0xf3, 0x67, 0x09, 0x86, 0x96, 0xfc, 0x99, 0x3f, 0xfb, 0x13, 0x00, 0x00, 0xff, 0xff, 0xba,
+	0x5b, 0x84, 0xa6, 0xda, 0x07, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -929,9 +1004,10 @@ type KobeApiClient interface {
 	CreateProject(ctx context.Context, in *CreateProjectRequest, opts ...grpc.CallOption) (*CreateProjectResponse, error)
 	ListProject(ctx context.Context, in *ListProjectRequest, opts ...grpc.CallOption) (*ListProjectResponse, error)
 	GetInventory(ctx context.Context, in *GetInventoryRequest, opts ...grpc.CallOption) (*GetInventoryResponse, error)
-	RunPlaybook(ctx context.Context, in *RunPlaybookRequest, opts ...grpc.CallOption) (KobeApi_RunPlaybookClient, error)
-	SaveResult(ctx context.Context, in *SaveResultRequest, opts ...grpc.CallOption) (*SaveResultResponse, error)
+	RunPlaybook(ctx context.Context, in *RunPlaybookRequest, opts ...grpc.CallOption) (*RunPlaybookResult, error)
+	WatchRunPlaybook(ctx context.Context, in *WatchPlaybookRequest, opts ...grpc.CallOption) (KobeApi_WatchRunPlaybookClient, error)
 	GetResult(ctx context.Context, in *GetResultRequest, opts ...grpc.CallOption) (*GetResultResponse, error)
+	ListResult(ctx context.Context, in *ListResultRequest, opts ...grpc.CallOption) (*ListResultResponse, error)
 }
 
 type kobeApiClient struct {
@@ -969,12 +1045,21 @@ func (c *kobeApiClient) GetInventory(ctx context.Context, in *GetInventoryReques
 	return out, nil
 }
 
-func (c *kobeApiClient) RunPlaybook(ctx context.Context, in *RunPlaybookRequest, opts ...grpc.CallOption) (KobeApi_RunPlaybookClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_KobeApi_serviceDesc.Streams[0], "/api.KobeApi/RunPlaybook", opts...)
+func (c *kobeApiClient) RunPlaybook(ctx context.Context, in *RunPlaybookRequest, opts ...grpc.CallOption) (*RunPlaybookResult, error) {
+	out := new(RunPlaybookResult)
+	err := c.cc.Invoke(ctx, "/api.KobeApi/RunPlaybook", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &kobeApiRunPlaybookClient{stream}
+	return out, nil
+}
+
+func (c *kobeApiClient) WatchRunPlaybook(ctx context.Context, in *WatchPlaybookRequest, opts ...grpc.CallOption) (KobeApi_WatchRunPlaybookClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_KobeApi_serviceDesc.Streams[0], "/api.KobeApi/WatchRunPlaybook", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &kobeApiWatchRunPlaybookClient{stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -984,30 +1069,21 @@ func (c *kobeApiClient) RunPlaybook(ctx context.Context, in *RunPlaybookRequest,
 	return x, nil
 }
 
-type KobeApi_RunPlaybookClient interface {
+type KobeApi_WatchRunPlaybookClient interface {
 	Recv() (*WatchStream, error)
 	grpc.ClientStream
 }
 
-type kobeApiRunPlaybookClient struct {
+type kobeApiWatchRunPlaybookClient struct {
 	grpc.ClientStream
 }
 
-func (x *kobeApiRunPlaybookClient) Recv() (*WatchStream, error) {
+func (x *kobeApiWatchRunPlaybookClient) Recv() (*WatchStream, error) {
 	m := new(WatchStream)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
 	return m, nil
-}
-
-func (c *kobeApiClient) SaveResult(ctx context.Context, in *SaveResultRequest, opts ...grpc.CallOption) (*SaveResultResponse, error) {
-	out := new(SaveResultResponse)
-	err := c.cc.Invoke(ctx, "/api.KobeApi/SaveResult", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *kobeApiClient) GetResult(ctx context.Context, in *GetResultRequest, opts ...grpc.CallOption) (*GetResultResponse, error) {
@@ -1019,14 +1095,24 @@ func (c *kobeApiClient) GetResult(ctx context.Context, in *GetResultRequest, opt
 	return out, nil
 }
 
+func (c *kobeApiClient) ListResult(ctx context.Context, in *ListResultRequest, opts ...grpc.CallOption) (*ListResultResponse, error) {
+	out := new(ListResultResponse)
+	err := c.cc.Invoke(ctx, "/api.KobeApi/ListResult", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // KobeApiServer is the server API for KobeApi service.
 type KobeApiServer interface {
 	CreateProject(context.Context, *CreateProjectRequest) (*CreateProjectResponse, error)
 	ListProject(context.Context, *ListProjectRequest) (*ListProjectResponse, error)
 	GetInventory(context.Context, *GetInventoryRequest) (*GetInventoryResponse, error)
-	RunPlaybook(*RunPlaybookRequest, KobeApi_RunPlaybookServer) error
-	SaveResult(context.Context, *SaveResultRequest) (*SaveResultResponse, error)
+	RunPlaybook(context.Context, *RunPlaybookRequest) (*RunPlaybookResult, error)
+	WatchRunPlaybook(*WatchPlaybookRequest, KobeApi_WatchRunPlaybookServer) error
 	GetResult(context.Context, *GetResultRequest) (*GetResultResponse, error)
+	ListResult(context.Context, *ListResultRequest) (*ListResultResponse, error)
 }
 
 // UnimplementedKobeApiServer can be embedded to have forward compatible implementations.
@@ -1042,14 +1128,17 @@ func (*UnimplementedKobeApiServer) ListProject(ctx context.Context, req *ListPro
 func (*UnimplementedKobeApiServer) GetInventory(ctx context.Context, req *GetInventoryRequest) (*GetInventoryResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetInventory not implemented")
 }
-func (*UnimplementedKobeApiServer) RunPlaybook(req *RunPlaybookRequest, srv KobeApi_RunPlaybookServer) error {
-	return status.Errorf(codes.Unimplemented, "method RunPlaybook not implemented")
+func (*UnimplementedKobeApiServer) RunPlaybook(ctx context.Context, req *RunPlaybookRequest) (*RunPlaybookResult, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RunPlaybook not implemented")
 }
-func (*UnimplementedKobeApiServer) SaveResult(ctx context.Context, req *SaveResultRequest) (*SaveResultResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SaveResult not implemented")
+func (*UnimplementedKobeApiServer) WatchRunPlaybook(req *WatchPlaybookRequest, srv KobeApi_WatchRunPlaybookServer) error {
+	return status.Errorf(codes.Unimplemented, "method WatchRunPlaybook not implemented")
 }
 func (*UnimplementedKobeApiServer) GetResult(ctx context.Context, req *GetResultRequest) (*GetResultResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetResult not implemented")
+}
+func (*UnimplementedKobeApiServer) ListResult(ctx context.Context, req *ListResultRequest) (*ListResultResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListResult not implemented")
 }
 
 func RegisterKobeApiServer(s *grpc.Server, srv KobeApiServer) {
@@ -1110,43 +1199,43 @@ func _KobeApi_GetInventory_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
-func _KobeApi_RunPlaybook_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(RunPlaybookRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(KobeApiServer).RunPlaybook(m, &kobeApiRunPlaybookServer{stream})
-}
-
-type KobeApi_RunPlaybookServer interface {
-	Send(*WatchStream) error
-	grpc.ServerStream
-}
-
-type kobeApiRunPlaybookServer struct {
-	grpc.ServerStream
-}
-
-func (x *kobeApiRunPlaybookServer) Send(m *WatchStream) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func _KobeApi_SaveResult_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SaveResultRequest)
+func _KobeApi_RunPlaybook_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RunPlaybookRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(KobeApiServer).SaveResult(ctx, in)
+		return srv.(KobeApiServer).RunPlaybook(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/api.KobeApi/SaveResult",
+		FullMethod: "/api.KobeApi/RunPlaybook",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KobeApiServer).SaveResult(ctx, req.(*SaveResultRequest))
+		return srv.(KobeApiServer).RunPlaybook(ctx, req.(*RunPlaybookRequest))
 	}
 	return interceptor(ctx, in, info, handler)
+}
+
+func _KobeApi_WatchRunPlaybook_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(WatchPlaybookRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(KobeApiServer).WatchRunPlaybook(m, &kobeApiWatchRunPlaybookServer{stream})
+}
+
+type KobeApi_WatchRunPlaybookServer interface {
+	Send(*WatchStream) error
+	grpc.ServerStream
+}
+
+type kobeApiWatchRunPlaybookServer struct {
+	grpc.ServerStream
+}
+
+func (x *kobeApiWatchRunPlaybookServer) Send(m *WatchStream) error {
+	return x.ServerStream.SendMsg(m)
 }
 
 func _KobeApi_GetResult_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -1163,6 +1252,24 @@ func _KobeApi_GetResult_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(KobeApiServer).GetResult(ctx, req.(*GetResultRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _KobeApi_ListResult_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListResultRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KobeApiServer).ListResult(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.KobeApi/ListResult",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KobeApiServer).ListResult(ctx, req.(*ListResultRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1184,18 +1291,22 @@ var _KobeApi_serviceDesc = grpc.ServiceDesc{
 			Handler:    _KobeApi_GetInventory_Handler,
 		},
 		{
-			MethodName: "SaveResult",
-			Handler:    _KobeApi_SaveResult_Handler,
+			MethodName: "RunPlaybook",
+			Handler:    _KobeApi_RunPlaybook_Handler,
 		},
 		{
 			MethodName: "GetResult",
 			Handler:    _KobeApi_GetResult_Handler,
 		},
+		{
+			MethodName: "ListResult",
+			Handler:    _KobeApi_ListResult_Handler,
+		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
-			StreamName:    "RunPlaybook",
-			Handler:       _KobeApi_RunPlaybook_Handler,
+			StreamName:    "WatchRunPlaybook",
+			Handler:       _KobeApi_WatchRunPlaybook_Handler,
 			ServerStreams: true,
 		},
 	},

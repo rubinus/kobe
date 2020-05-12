@@ -54,10 +54,10 @@ func (c KobeClient) ListProject() ([]*api.Project, error) {
 	return resp.Items, nil
 }
 
-func (c KobeClient) RunPlaybook(project, playbook string, inventory api.Inventory, writer io.Writer, result *api.Result) error {
+func (c KobeClient) RunPlaybook(project, playbook string, inventory api.Inventory) (*api.Result, error) {
 	conn, err := c.createConnection()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer conn.Close()
 	client := api.NewKobeApiClient(conn)
@@ -66,7 +66,24 @@ func (c KobeClient) RunPlaybook(project, playbook string, inventory api.Inventor
 		Playbook:  playbook,
 		Inventory: &inventory,
 	}
-	server, err := client.RunPlaybook(context.Background(), request)
+	req, err := client.RunPlaybook(context.Background(), request)
+	if err != nil {
+		return nil, err
+	}
+	return req.Result, nil
+}
+
+func (c *KobeClient) WatchRunPlaybook(taskId string, writer io.Writer) error {
+	conn, err := c.createConnection()
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+	client := api.NewKobeApiClient(conn)
+	req := &api.WatchPlaybookRequest{
+		TaskId: taskId,
+	}
+	server, err := client.WatchRunPlaybook(context.Background(), req)
 	if err != nil {
 		return err
 	}
@@ -75,19 +92,44 @@ func (c KobeClient) RunPlaybook(project, playbook string, inventory api.Inventor
 		if err != nil {
 			return err
 		}
-		result = msg.Result
 		_, err = writer.Write(msg.Stream)
-		if err != nil {
-			return err
-		}
-		if result.Finished {
+		if err != nil || err == io.EOF {
 			break
 		}
 	}
 	return nil
 }
-func (c *KobeClient) GetResult(taskId string) {
 
+func (c *KobeClient) GetResult(taskId string) (*api.Result, error) {
+	conn, err := c.createConnection()
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	client := api.NewKobeApiClient(conn)
+	request := api.GetResultRequest{
+		TaskId: taskId,
+	}
+	resp, err := client.GetResult(context.Background(), &request)
+	if err != nil {
+		return nil, err
+	}
+	return resp.Item, nil
+}
+
+func (c *KobeClient) ListResult() ([]*api.Result, error) {
+	conn, err := c.createConnection()
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	client := api.NewKobeApiClient(conn)
+	request := api.ListResultRequest{}
+	resp, err := client.ListResult(context.Background(), &request)
+	if err != nil {
+		return nil, err
+	}
+	return resp.Items, nil
 }
 
 func (c *KobeClient) createConnection() (*grpc.ClientConn, error) {

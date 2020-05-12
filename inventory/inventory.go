@@ -93,7 +93,7 @@ func (kip kobeInventoryProvider) ListHandler() (Result, error) {
 }
 
 func (kip kobeInventoryProvider) getInventoryId() (string, error) {
-	id := os.Getenv(constant.InventoryEnvKey)
+	id := os.Getenv(constant.TaskEnvKey)
 	if id == "" {
 		return "", errors.New(fmt.Sprintf("invalid id: %s", id))
 	}
