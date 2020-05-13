@@ -6,7 +6,7 @@ hosts:
     password: Calong@2015
     vars: {}
 groups:
-  - name: master
+  - name: test
     chidren: []
     hosts:
       - master1

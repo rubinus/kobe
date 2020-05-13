@@ -24,6 +24,7 @@ var taskDescribeCmd = &cobra.Command{
 		fmt.Println(fmt.Sprintf("end time: %s", result.EndTime))
 		fmt.Println(fmt.Sprintf("finished: %t", result.Finished))
 		fmt.Println(fmt.Sprintf("success: %t", result.Success))
+		fmt.Println(fmt.Sprintf("message:%s", result.Message))
 		fmt.Println(fmt.Sprintf("content:"))
 		fmt.Println(result.Content)
 	},

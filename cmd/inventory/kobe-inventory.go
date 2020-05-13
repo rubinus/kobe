@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"kobe/inventory"
 	"kobe/pkg/config"
+	"kobe/pkg/inventory"
 	"os"
 )
 
@@ -38,7 +38,7 @@ func init() {
 }
 
 func main() {
-	config.InitConfig()
+	config.Init()
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}

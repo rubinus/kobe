@@ -10,10 +10,13 @@ func prepareStart() error {
 	funcs := []func() error{
 		makeDataDir,
 		lookUpAnsibleBinPath,
-		lookUpKobeInventoryBinPath}
+		lookUpKobeInventoryBinPath,
+		cleanWorkPath,
+	}
 	for _, f := range funcs {
-		err := f()
-		return err
+		if err := f(); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -39,5 +42,10 @@ func lookUpKobeInventoryBinPath() error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func cleanWorkPath() error {
+	_ = os.RemoveAll(constant.WorkDir)
 	return nil
 }

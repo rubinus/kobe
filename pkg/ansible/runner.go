@@ -2,7 +2,6 @@ package ansible
 
 import (
 	"fmt"
-	"github.com/prometheus/common/log"
 	"io"
 	"kobe/api"
 	"kobe/pkg/constant"
@@ -40,14 +39,21 @@ func (p *PlaybookRunner) Run(ch chan []byte, result *api.Result) {
 		result.EndTime = time.Now().String()
 	}()
 
-	if _, err := exec.LookPath(constant.AnsiblePlaybookBinPath); err != nil {
+	ansiblePath, err := exec.LookPath(constant.AnsiblePlaybookBinPath)
+	if err != nil {
 		result.Success = false
 		result.Message = err.Error()
-		log.Error(err)
 		return
 	}
-	cmd := exec.Command(constant.AnsiblePlaybookBinPath,
-		"-i", constant.InventoryProviderBinPath,
+	inventoryProviderPath, err := exec.LookPath(constant.InventoryProviderBinPath)
+	if err != nil {
+		result.Success = false
+		result.Message = err.Error()
+		return
+	}
+
+	cmd := exec.Command(ansiblePath,
+		"-i", inventoryProviderPath,
 		path.Join(constant.ProjectDir, p.Project.Name, p.Playbook))
 	cmdEnv := make([]string, 0)
 	cmdEnv = append(cmdEnv, fmt.Sprintf("%s=%s", constant.TaskEnvKey, result.Id))
