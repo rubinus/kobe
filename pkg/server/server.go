@@ -29,7 +29,6 @@ func NewKobe() *Kobe {
 
 func (k Kobe) CreateProject(ctx context.Context, req *api.CreateProjectRequest) (*api.CreateProjectResponse, error) {
 	pm := ProjectManager{}
-
 	p, err := pm.CreateProject(req.Name, req.Source)
 	if err != nil {
 		return nil, err
@@ -64,6 +63,17 @@ func (k Kobe) WatchRunPlaybook(req *api.WatchPlaybookRequest, server api.KobeApi
 	if !found {
 		return errors.New(fmt.Sprintf("can not find task: %s", req.TaskId))
 	}
+	t, found := k.taskCache.Get(req.TaskId)
+	if !found {
+		return errors.New(fmt.Sprintf("can not find task: %s", req.TaskId))
+	}
+	tv, ok := t.(*api.Result)
+	if !ok {
+		return errors.New(fmt.Sprintf("invalid cache"))
+	}
+	if tv.Finished {
+		return errors.New(fmt.Sprintf("task: %s already finished", req.TaskId))
+	}
 	val, ok := ch.(chan []byte)
 	if !ok {
 		return errors.New(fmt.Sprintf("invalid cache"))
@@ -84,7 +94,7 @@ func (k Kobe) RunPlaybook(ctx context.Context, req *api.RunPlaybookRequest) (*ap
 	id := uuid.NewV4().String()
 	result := api.Result{
 		Id:        id,
-		StartTime: time.Now().String(),
+		StartTime: time.Now().Format("2006-01-02 15:04:05"),
 		EndTime:   "",
 		Message:   "",
 		Success:   false,
@@ -95,10 +105,14 @@ func (k Kobe) RunPlaybook(ctx context.Context, req *api.RunPlaybookRequest) (*ap
 	k.taskCache.Set(result.Id, &result, cache.DefaultExpiration)
 	k.chCache.Set(result.Id, ch, cache.DefaultExpiration)
 	k.inventoryCache.Set(result.Id, req.Inventory, cache.DefaultExpiration)
-	runner, _ := rm.CreatePlaybookRunner(req.Project, req.Playbook)
+	runner, err := rm.CreatePlaybookRunner(req.Project, req.Playbook)
+	if err != nil {
+		return nil, err
+	}
 	go func() {
 		runner.Run(ch, &result)
 		result.Finished = true
+		result.EndTime = time.Now().Format("2006-01-02 15:04:05")
 		k.taskCache.Set(result.Id, &result, cache.DefaultExpiration)
 	}()
 	return &api.RunPlaybookResult{

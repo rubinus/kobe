@@ -3,7 +3,7 @@ package project
 import (
 	"fmt"
 	"github.com/spf13/cobra"
-	"kobe/client"
+	"kobe/pkg/client"
 	"log"
 )
 
@@ -23,7 +23,8 @@ var projectCreateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Printf("project %s created", p.Name)
+		fmt.Println(fmt.Sprintf("project %s created", p.Name))
+
 	},
 }
 

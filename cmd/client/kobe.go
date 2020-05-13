@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	config.InitConfig()
+	config.Init()
 	if err := root.Cmd.Execute(); err != nil {
 		os.Exit(1)
 	}

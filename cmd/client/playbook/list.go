@@ -3,7 +3,7 @@ package playbook
 import (
 	"fmt"
 	"github.com/spf13/cobra"
-	"kobe/client"
+	"kobe/pkg/client"
 	"log"
 )
 

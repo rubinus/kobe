@@ -89,11 +89,14 @@ func (c *KobeClient) WatchRunPlaybook(taskId string, writer io.Writer) error {
 	}
 	for {
 		msg, err := server.Recv()
+		if err == io.EOF {
+			break
+		}
 		if err != nil {
 			return err
 		}
 		_, err = writer.Write(msg.Stream)
-		if err != nil || err == io.EOF {
+		if err != nil {
 			break
 		}
 	}

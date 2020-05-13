@@ -6,7 +6,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"kobe/api"
-	"kobe/client"
+	"kobe/pkg/client"
 	"log"
 	"os"
 )
@@ -47,6 +47,9 @@ var playbookRunCmd = &cobra.Command{
 		if backend {
 			fmt.Println(result.Id)
 		} else {
+			if result.Finished && !result.Success {
+				log.Fatal(result.Message)
+			}
 			err := c.WatchRunPlaybook(result.Id, os.Stdout)
 			if err != nil {
 				log.Fatal(err)
