@@ -3,6 +3,7 @@ package task
 import (
 	"fmt"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"kobe/pkg/client"
 	"log"
 )
@@ -10,7 +11,9 @@ import (
 var taskDescribeCmd = &cobra.Command{
 	Use: "describe",
 	Run: func(cmd *cobra.Command, args []string) {
-		c := client.NewKobeClient("127.0.0.1", 8080)
+		host := viper.GetString("server.host")
+		port := viper.GetInt("server.port")
+		c := client.NewKobeClient(host, port)
 		if len(args) < 1 {
 			log.Fatal("task id missing")
 		}

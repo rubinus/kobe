@@ -3,6 +3,7 @@ package task
 import (
 	"fmt"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"kobe/pkg/client"
 	"log"
 )
@@ -10,7 +11,9 @@ import (
 var taskListCmd = &cobra.Command{
 	Use: "list",
 	Run: func(cmd *cobra.Command, args []string) {
-		c := client.NewKobeClient("127.0.0.1", 8080)
+		host := viper.GetString("server.host")
+		port := viper.GetInt("server.port")
+		c := client.NewKobeClient(host, port)
 		rs, err := c.ListResult()
 		if err != nil {
 			log.Fatal(err)

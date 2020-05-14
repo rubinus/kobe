@@ -1,8 +1,10 @@
 package playbook
 
 import (
+	"errors"
 	"fmt"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"kobe/api"
@@ -14,10 +16,15 @@ import (
 var playbookRunCmd = &cobra.Command{
 	Use: "run",
 	Run: func(cmd *cobra.Command, args []string) {
-		c := client.NewKobeClient("127.0.0.1", 8080)
+		host := viper.GetString("server.host")
+		port := viper.GetInt("server.port")
+		c := client.NewKobeClient(host, port)
 		project, err := cmd.Flags().GetString("project")
 		if err != nil {
 			log.Fatal(err)
+		}
+		if project == "" {
+			log.Fatal(errors.New("you must specify project name"))
 		}
 		inventoryPath, err := cmd.Flags().GetString("inventory")
 		if err != nil {
@@ -60,7 +67,7 @@ var playbookRunCmd = &cobra.Command{
 }
 
 func init() {
-	playbookRunCmd.Flags().StringP("project", "p", "", "")
-	playbookRunCmd.Flags().BoolP("b", "b", false, "")
-	playbookRunCmd.Flags().StringP("inventory", "i", "", "")
+	playbookRunCmd.Flags().StringP("project", "p", "", "specify project name")
+	playbookRunCmd.Flags().BoolP("b", "b", false, "run in background")
+	playbookRunCmd.Flags().StringP("inventory", "i", "", "specify inventory file path")
 }

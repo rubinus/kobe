@@ -3,6 +3,7 @@ package project
 import (
 	"fmt"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"kobe/pkg/client"
 	"log"
 )
@@ -10,7 +11,9 @@ import (
 var projectListCmd = &cobra.Command{
 	Use: "list",
 	Run: func(cmd *cobra.Command, args []string) {
-		c := client.NewKobeClient("127.0.0.1", 8080)
+		host := viper.GetString("server.host")
+		port := viper.GetInt("server.port")
+		c := client.NewKobeClient(host, port)
 		ps, err := c.ListProject()
 		if err != nil {
 			log.Fatal(err)

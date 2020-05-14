@@ -1,8 +1,10 @@
 package project
 
 import (
+	"errors"
 	"fmt"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"kobe/pkg/client"
 	"log"
 )
@@ -10,7 +12,9 @@ import (
 var projectCreateCmd = &cobra.Command{
 	Use: "create",
 	Run: func(cmd *cobra.Command, args []string) {
-		c := client.NewKobeClient("127.0.0.1", 8080)
+		host := viper.GetString("server.host")
+		port := viper.GetInt("server.port")
+		c := client.NewKobeClient(host, port)
 		if len(args) < 0 {
 			log.Fatal("invalid project source")
 		}
@@ -18,13 +22,15 @@ var projectCreateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
+		if name == "" {
+			log.Fatal(errors.New("you must provide a valid project name"))
+		}
 		source := args[0]
 		p, err := c.CreateProject(name, source)
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Println(fmt.Sprintf("project %s created", p.Name))
-
+		fmt.Println(fmt.Sprintf("%s created", p.Name))
 	},
 }
 
