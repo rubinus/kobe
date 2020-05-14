@@ -20,5 +20,9 @@ FROM lucasrolff/python38-ansible:latest
 COPY --from=stage-build /build/kobe/dist/etc /etc/
 COPY --from=stage-build /build/kobe/dist/usr /usr/
 COPY --from=stage-build /build/kobe/dist/var /var/
+
+VOLUME ["/var/kobe/data"]
+
 EXPOSE 8080
+
 CMD ["kobe-server"]
