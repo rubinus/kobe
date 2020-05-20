@@ -1,7 +1,7 @@
 package main
 
 import (
-	"kobe/pkg/constant"
+	"github.com/KubeOperator/kobe/pkg/constant"
 	"os"
 	"os/exec"
 )

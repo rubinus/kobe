@@ -7,8 +7,8 @@ import (
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
-	"kobe/api"
-	"kobe/pkg/client"
+	"github.com/KubeOperator/kobe/api"
+	"github.com/KubeOperator/kobe/pkg/client"
 	"log"
 	"os"
 )

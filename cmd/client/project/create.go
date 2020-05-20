@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"kobe/pkg/client"
+	"github.com/KubeOperator/kobe/pkg/client"
 	"log"
 )
 

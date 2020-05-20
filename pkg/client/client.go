@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"google.golang.org/grpc"
 	"io"
-	"kobe/api"
+	"github.com/KubeOperator/kobe/api"
 )
 
 func NewKobeClient(host string, port int) *KobeClient {

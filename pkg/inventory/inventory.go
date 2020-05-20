@@ -6,8 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"google.golang.org/grpc"
-	"kobe/api"
-	"kobe/pkg/constant"
+	"github.com/KubeOperator/kobe/api"
+	"github.com/KubeOperator/kobe/pkg/constant"
 	"os"
 )
 

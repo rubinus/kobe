@@ -2,8 +2,8 @@ package main
 
 import (
 	"google.golang.org/grpc"
-	"kobe/api"
-	"kobe/pkg/server"
+	"github.com/KubeOperator/kobe/api"
+	"github.com/KubeOperator/kobe/pkg/server"
 	"net"
 )
 

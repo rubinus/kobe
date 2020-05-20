@@ -7,8 +7,8 @@ import (
 	"github.com/patrickmn/go-cache"
 	uuid "github.com/satori/go.uuid"
 	"io/ioutil"
-	"kobe/api"
-	"kobe/pkg/constant"
+	"github.com/KubeOperator/kobe/api"
+	"github.com/KubeOperator/kobe/pkg/constant"
 	"path"
 	"time"
 )

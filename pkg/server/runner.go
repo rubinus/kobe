@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/patrickmn/go-cache"
-	"kobe/pkg/ansible"
+	"github.com/KubeOperator/kobe/pkg/ansible"
 )
 
 type RunnerManager struct {

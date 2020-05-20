@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"kobe/api"
-	"kobe/pkg/client"
+	"github.com/KubeOperator/kobe/api"
+	"github.com/KubeOperator/kobe/pkg/client"
 	"log"
 )
 

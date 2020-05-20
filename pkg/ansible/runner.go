@@ -2,9 +2,9 @@ package ansible
 
 import (
 	"fmt"
+	"github.com/KubeOperator/kobe/api"
+	"github.com/KubeOperator/kobe/pkg/constant"
 	"io"
-	"kobe/api"
-	"kobe/pkg/constant"
 	"os"
 	"os/exec"
 	"path"

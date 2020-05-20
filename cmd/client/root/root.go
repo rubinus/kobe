@@ -2,9 +2,9 @@ package root
 
 import (
 	"github.com/spf13/cobra"
-	"kobe/cmd/client/playbook"
-	"kobe/cmd/client/project"
-	"kobe/cmd/client/task"
+	"github.com/KubeOperator/kobe/cmd/client/playbook"
+	"github.com/KubeOperator/kobe/cmd/client/project"
+	"github.com/KubeOperator/kobe/cmd/client/task"
 )
 
 var Cmd = &cobra.Command{

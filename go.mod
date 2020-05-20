@@ -1,4 +1,4 @@
-module kobe
+module github.com/KubeOperator/kobe
 
 go 1.13
 
