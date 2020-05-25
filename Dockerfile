@@ -17,6 +17,8 @@ COPY . .
 RUN make build_server_linux
 
 FROM lucasrolff/python38-ansible:latest
+
+RUN apt install sshpass
 COPY --from=stage-build /build/kobe/dist/etc /etc/
 COPY --from=stage-build /build/kobe/dist/usr /usr/
 COPY --from=stage-build /build/kobe/dist/var /var/
