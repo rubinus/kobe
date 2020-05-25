@@ -4,11 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/KubeOperator/kobe/api"
+	"github.com/KubeOperator/kobe/pkg/constant"
 	"github.com/patrickmn/go-cache"
 	uuid "github.com/satori/go.uuid"
 	"io/ioutil"
-	"github.com/KubeOperator/kobe/api"
-	"github.com/KubeOperator/kobe/pkg/constant"
 	"path"
 	"time"
 )
@@ -58,7 +58,7 @@ func (k Kobe) GetInventory(ctx context.Context, req *api.GetInventoryRequest) (*
 	return resp, nil
 }
 
-func (k Kobe) WatchRunPlaybook(req *api.WatchPlaybookRequest, server api.KobeApi_WatchRunPlaybookServer) error {
+func (k Kobe) WatchResult(req *api.WatchRequest, server api.KobeApi_WatchResultServer) error {
 	ch, found := k.chCache.Get(req.TaskId)
 	if !found {
 		return errors.New(fmt.Sprintf("can not find task: %s", req.TaskId))
@@ -84,6 +84,39 @@ func (k Kobe) WatchRunPlaybook(req *api.WatchPlaybookRequest, server api.KobeApi
 		})
 	}
 	return nil
+}
+
+func (k Kobe) RunAdhoc(ctx context.Context, req *api.RunAdhocRequest) (*api.RunAdhocResult, error) {
+	rm := RunnerManager{
+		inventoryCache: k.inventoryCache,
+	}
+	ch := make(chan []byte)
+	id := uuid.NewV4().String()
+	result := api.Result{
+		Id:        id,
+		StartTime: time.Now().Format("2006-01-02 15:04:05"),
+		EndTime:   "",
+		Message:   "",
+		Success:   false,
+		Finished:  false,
+		Content:   "",
+	}
+	k.taskCache.Set(result.Id, &result, cache.DefaultExpiration)
+	k.chCache.Set(result.Id, ch, cache.DefaultExpiration)
+	k.inventoryCache.Set(result.Id, req.Inventory, cache.DefaultExpiration)
+	runner, err := rm.CreateAdhocRunner(req.Pattern, req.Module, req.Param)
+	if err != nil {
+		return nil, err
+	}
+	go func() {
+		runner.Run(ch, &result)
+		result.Finished = true
+		result.EndTime = time.Now().Format("2006-01-02 15:04:05")
+		k.taskCache.Set(result.Id, &result, cache.DefaultExpiration)
+	}()
+	return &api.RunAdhocResult{
+		Result: &result,
+	}, nil
 }
 
 func (k Kobe) RunPlaybook(ctx context.Context, req *api.RunPlaybookRequest) (*api.RunPlaybookResult, error) {
@@ -129,6 +162,9 @@ func (k Kobe) GetResult(ctx context.Context, req *api.GetResultRequest) (*api.Ge
 	val, ok := result.(*api.Result)
 	if !ok {
 		return nil, errors.New("invalid result type")
+	}
+	if val.Project == "" {
+		val.Project = "adhoc"
 	}
 	if val.Finished && val.Success {
 		bytes, err := ioutil.ReadFile(path.Join(constant.WorkDir, val.Project, val.Id, "result.json"))

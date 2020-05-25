@@ -7,7 +7,8 @@ service KobeApi {
   rpc ListProject(ListProjectRequest) returns(ListProjectResponse){}
   rpc GetInventory(GetInventoryRequest) returns(GetInventoryResponse){}
   rpc RunPlaybook(RunPlaybookRequest) returns(RunPlaybookResult){}
-  rpc WatchRunPlaybook(WatchPlaybookRequest) returns(stream WatchStream){}
+  rpc RunAdhoc(RunAdhocRequest) returns(RunAdhocResult){}
+  rpc WatchResult(WatchRequest) returns(stream WatchStream){}
   rpc GetResult(GetResultRequest) returns(GetResultResponse){}
   rpc ListResult(ListResultRequest) returns(ListResultResponse){}
 }
@@ -63,6 +64,17 @@ message RunPlaybookResult {
   Result result = 1;
 }
 
+message RunAdhocRequest {
+  Inventory inventory = 1;
+  string pattern = 2;
+  string module = 3;
+  string param = 4;
+}
+
+message RunAdhocResult{
+  Result result = 1;
+}
+
 message Result {
   string id = 1;
   string startTime = 2;
@@ -78,7 +90,7 @@ message WatchStream {
   bytes stream = 1;
 }
 
-message WatchPlaybookRequest{
+message WatchRequest{
   string taskId = 1;
 }
 

@@ -3,6 +3,7 @@ module github.com/KubeOperator/kobe
 go 1.14
 
 require (
+	github.com/ghodss/yaml v1.0.0
 	github.com/go-git/go-git/v5 v5.0.0
 	github.com/golang/protobuf v1.3.3
 	github.com/patrickmn/go-cache v2.1.0+incompatible

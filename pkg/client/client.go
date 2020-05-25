@@ -3,9 +3,9 @@ package client
 import (
 	"context"
 	"fmt"
+	"github.com/KubeOperator/kobe/api"
 	"google.golang.org/grpc"
 	"io"
-	"github.com/KubeOperator/kobe/api"
 )
 
 func NewKobeClient(host string, port int) *KobeClient {
@@ -73,17 +73,37 @@ func (c KobeClient) RunPlaybook(project, playbook string, inventory api.Inventor
 	return req.Result, nil
 }
 
-func (c *KobeClient) WatchRunPlaybook(taskId string, writer io.Writer) error {
+func (c KobeClient) RunAdhoc(pattern, module, param string, inventory api.Inventory) (*api.Result, error) {
+	conn, err := c.createConnection()
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	client := api.NewKobeApiClient(conn)
+	request := &api.RunAdhocRequest{
+		Inventory: &inventory,
+		Module:    module,
+		Param:     param,
+		Pattern:   pattern,
+	}
+	req, err := client.RunAdhoc(context.Background(), request)
+	if err != nil {
+		return nil, err
+	}
+	return req.Result, nil
+}
+
+func (c *KobeClient) WatchRun(taskId string, writer io.Writer) error {
 	conn, err := c.createConnection()
 	if err != nil {
 		return err
 	}
 	defer conn.Close()
 	client := api.NewKobeApiClient(conn)
-	req := &api.WatchPlaybookRequest{
+	req := &api.WatchRequest{
 		TaskId: taskId,
 	}
-	server, err := client.WatchRunPlaybook(context.Background(), req)
+	server, err := client.WatchResult(context.Background(), req)
 	if err != nil {
 		return err
 	}

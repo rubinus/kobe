@@ -1,6 +1,7 @@
 package ansible
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/KubeOperator/kobe/api"
 	"github.com/KubeOperator/kobe/pkg/constant"
@@ -22,23 +23,39 @@ type PlaybookRunner struct {
 	Playbook string
 }
 
-func (p *PlaybookRunner) Run(ch chan []byte, result *api.Result) {
-	workPath, err := initWorkSpace(p.Project)
-	if err != nil {
-		result.Message = err.Error()
-		return
-	}
-	pwd, err := os.Getwd()
-	if err != nil {
-		result.Message = err.Error()
-		return
-	}
-	os.Chdir(workPath)
-	defer func() {
-		os.Chdir(pwd)
-		result.EndTime = time.Now().String()
-	}()
+type AdhocRunner struct {
+	Module  string
+	Param   string
+	Pattern string
+}
 
+func (a *AdhocRunner) Run(ch chan []byte, result *api.Result) {
+	ansiblePath, err := exec.LookPath(constant.AnsibleBinPath)
+	if err != nil {
+		result.Success = false
+		result.Message = err.Error()
+		return
+	}
+	inventoryProviderPath, err := exec.LookPath(constant.InventoryProviderBinPath)
+	if err != nil {
+		result.Success = false
+		result.Message = err.Error()
+		return
+	}
+
+	cmd := exec.Command(ansiblePath,
+		"-i", inventoryProviderPath, a.Pattern, "-m", a.Module)
+	if a.Param != "" {
+		cmd.Args = append(cmd.Args, "-a", a.Param)
+	}
+	cmdEnv := make([]string, 0)
+	cmdEnv = append(cmdEnv, fmt.Sprintf("%s=%s", constant.TaskEnvKey, result.Id))
+	cmd.Env = append(os.Environ(), cmdEnv...)
+	runCmd(ch, "adhoc", cmd, result)
+
+}
+
+func (p *PlaybookRunner) Run(ch chan []byte, result *api.Result) {
 	ansiblePath, err := exec.LookPath(constant.AnsiblePlaybookBinPath)
 	if err != nil {
 		result.Success = false
@@ -58,6 +75,27 @@ func (p *PlaybookRunner) Run(ch chan []byte, result *api.Result) {
 	cmdEnv := make([]string, 0)
 	cmdEnv = append(cmdEnv, fmt.Sprintf("%s=%s", constant.TaskEnvKey, result.Id))
 	cmd.Env = append(os.Environ(), cmdEnv...)
+	runCmd(ch, p.Project.Name, cmd, result)
+}
+
+func runCmd(ch chan []byte, projectName string, cmd *exec.Cmd, result *api.Result) {
+	workPath, err := initWorkSpace(projectName)
+	if err != nil {
+		result.Message = err.Error()
+		return
+	}
+	pwd, err := os.Getwd()
+	if err != nil {
+		result.Message = err.Error()
+		return
+	}
+	os.Chdir(workPath)
+	defer func() {
+		os.Chdir(pwd)
+		result.EndTime = time.Now().String()
+	}()
+	stderr := &bytes.Buffer{}
+	cmd.Stderr = stderr
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		result.Success = false
@@ -85,14 +123,14 @@ func (p *PlaybookRunner) Run(ch chan []byte, result *api.Result) {
 	close(ch)
 	if err = cmd.Wait(); err != nil {
 		result.Success = false
-		result.Message = err.Error()
+		result.Message = stderr.String()
 		return
 	}
 	result.Success = true
 }
 
-func initWorkSpace(project api.Project) (string, error) {
-	workPath := path.Join(constant.WorkDir, project.Name)
+func initWorkSpace(projectName string) (string, error) {
+	workPath := path.Join(constant.WorkDir, projectName)
 	if err := os.MkdirAll(workPath, 0755); err != nil {
 		return "", err
 	}

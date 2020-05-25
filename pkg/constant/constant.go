@@ -8,6 +8,7 @@ import (
 const (
 	InventoryProviderBinPath = "kobe-inventory"
 	AnsiblePlaybookBinPath   = "ansible-playbook"
+	AnsibleBinPath   = "ansible"
 	TaskEnvKey               = "KO_TASK_ID"
 )
 

@@ -125,7 +125,7 @@ class CallbackModule(CallbackBase):
         task_result = result._result.copy()
         task_result.update(on_info)
         task_result['action'] = task.action
-        self.results[-1]['tasks'][-1]['hosts.json'][host.name] = task_result
+        self.results[-1]['tasks'][-1]['results'][host.name] = task_result
         end_time = current_time()
         self.results[-1]['tasks'][-1]['task']['duration']['end'] = end_time
         self.results[-1]['play']['duration']['end'] = end_time

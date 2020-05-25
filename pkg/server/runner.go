@@ -3,8 +3,8 @@ package server
 import (
 	"errors"
 	"fmt"
-	"github.com/patrickmn/go-cache"
 	"github.com/KubeOperator/kobe/pkg/ansible"
+	"github.com/patrickmn/go-cache"
 )
 
 type RunnerManager struct {
@@ -26,6 +26,17 @@ func (rm *RunnerManager) CreatePlaybookRunner(projectName, playbookName string) 
 		Playbook: playbookName,
 	}, nil
 }
+
+func (rm *RunnerManager) CreateAdhocRunner( pattern, module, param string) (*ansible.AdhocRunner, error) {
+
+	return &ansible.AdhocRunner{
+		Module:  module,
+		Param:   param,
+		Pattern: pattern,
+	}, nil
+}
+
+
 
 func preRunPlaybook(projectName, playbookName string) error {
 	pm := ProjectManager{}

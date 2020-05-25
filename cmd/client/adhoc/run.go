@@ -1,32 +1,26 @@
-package playbook
+package adhoc
 
 import (
-	"errors"
 	"fmt"
 	"github.com/KubeOperator/kobe/api"
 	"github.com/KubeOperator/kobe/pkg/client"
+	"github.com/ghodss/yaml"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
 	"os"
 	"time"
 )
 
-var playbookRunCmd = &cobra.Command{
+var adhocRunCmd = &cobra.Command{
 	Use: "run",
 	Run: func(cmd *cobra.Command, args []string) {
 		host := viper.GetString("server.host")
 		port := viper.GetInt("server.port")
 		c := client.NewKobeClient(host, port)
-		project, err := cmd.Flags().GetString("project")
-		if err != nil {
-			log.Fatal(err)
-		}
-		if project == "" {
-			log.Fatal(errors.New("you must specify project name"))
-		}
+		module, _ := cmd.Flags().GetString("module")
+		pattern, _ := cmd.Flags().GetString("pattern")
 		inventoryPath, err := cmd.Flags().GetString("inventory")
 		if err != nil {
 			log.Fatal(err)
@@ -40,11 +34,11 @@ var playbookRunCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		if len(args) < 1 {
-			log.Fatal("invalid playbook name")
+		var param string
+		if len(args) > 0 {
+			param = args[0]
 		}
-		playbook := args[0]
-		result, err := c.RunPlaybook(project, playbook, inventory)
+		result, err := c.RunAdhoc(pattern, module, param, inventory)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -81,12 +75,12 @@ var playbookRunCmd = &cobra.Command{
 				}
 			}
 		}
-
 	},
 }
 
 func init() {
-	playbookRunCmd.Flags().StringP("project", "p", "", "specify project name")
-	playbookRunCmd.Flags().BoolP("b", "b", false, "run in background")
-	playbookRunCmd.Flags().StringP("inventory", "i", "", "specify inventory file path")
+	adhocRunCmd.Flags().BoolP("b", "b", false, "run in background")
+	adhocRunCmd.Flags().StringP("inventory", "i", "", "specify inventory file path")
+	adhocRunCmd.Flags().StringP("module", "m", "shell", "specify ansible module")
+	adhocRunCmd.Flags().StringP("pattern", "p", "all", "specify inventory pattern")
 }
