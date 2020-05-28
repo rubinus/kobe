@@ -122,9 +122,11 @@ func runCmd(ch chan []byte, projectName string, cmd *exec.Cmd, result *api.Resul
 	}
 	close(ch)
 	if err = cmd.Wait(); err != nil {
-		result.Success = false
-		result.Message = stderr.String()
-		return
+		if cmd.ProcessState.ExitCode() != 2 {
+			result.Success = false
+			result.Message = stderr.String()
+			return
+		}
 	}
 	result.Success = true
 }

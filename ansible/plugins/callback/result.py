@@ -125,8 +125,8 @@ class CallbackModule(CallbackBase):
         task_result['action'] = task.action
         self.results[-1]['tasks'][-1]['hosts'][host.name] = task_result
         end_time = current_time()
-        self.results[-1]['tasks'][-1]['task']['duration']['end'] = end_time
-        self.results[-1]['play']['duration']['end'] = end_time
+        self.results[-1]['tasks'][-1]['duration']['end'] = end_time
+        self.results[-1]['duration']['end'] = end_time
 
     def __getattribute__(self, name):
         """Return ``_record_task_result`` partial with a dict containing skipped/failed if necessary"""
