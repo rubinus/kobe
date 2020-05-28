@@ -76,6 +76,7 @@ func (p *PlaybookRunner) Run(ch chan []byte, result *api.Result) {
 	cmdEnv = append(cmdEnv, fmt.Sprintf("%s=%s", constant.TaskEnvKey, result.Id))
 	cmd.Env = append(os.Environ(), cmdEnv...)
 	runCmd(ch, p.Project.Name, cmd, result)
+	fmt.Println(result.Id)
 }
 
 func runCmd(ch chan []byte, projectName string, cmd *exec.Cmd, result *api.Result) {
@@ -121,6 +122,8 @@ func runCmd(ch chan []byte, projectName string, cmd *exec.Cmd, result *api.Resul
 		}
 	}
 	close(ch)
+
+	fmt.Println(cmd.String())
 	if err = cmd.Wait(); err != nil {
 		result.Success = false
 		result.Message = stderr.String()

@@ -1,8 +1,11 @@
+# (c) 2016, Matt Martz <matt@sivel.net>
+# (c) 2017 Ansible Project
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+# Make coding more python3-ish
 from __future__ import (absolute_import, division, print_function)
 
 __metaclass__ = type
-
-import os
 
 DOCUMENTATION = '''
     callback: json
@@ -29,6 +32,7 @@ DOCUMENTATION = '''
 
 import datetime
 import json
+import os
 
 from functools import partial
 
@@ -52,26 +56,20 @@ class CallbackModule(CallbackBase):
 
     def _new_play(self, play):
         return {
-            'play': {
-                'name': play.get_name(),
-                'id': str(play._uuid),
-                'duration': {
-                    'start': current_time()
-                }
+            'name': play.get_name(),
+            'duration': {
+                'start': current_time()
             },
             'tasks': []
         }
 
     def _new_task(self, task):
         return {
-            'task': {
-                'name': task.get_name(),
-                'id': str(task._uuid),
-                'duration': {
-                    'start': current_time()
-                }
+            'name': task.get_name(),
+            'duration': {
+                'start': current_time()
             },
-            'results': {}
+            'hosts': {}
         }
 
     def v2_playbook_on_play_start(self, play):
@@ -125,10 +123,10 @@ class CallbackModule(CallbackBase):
         task_result = result._result.copy()
         task_result.update(on_info)
         task_result['action'] = task.action
-        self.results[-1]['tasks'][-1]['results'][host.name] = task_result
+        self.results[-1]['tasks'][-1]['hosts'][host.name] = task_result
         end_time = current_time()
-        self.results[-1]['tasks'][-1]['task']['duration']['end'] = end_time
-        self.results[-1]['play']['duration']['end'] = end_time
+        self.results[-1]['tasks'][-1]['duration']['end'] = end_time
+        self.results[-1]['duration']['end'] = end_time
 
     def __getattribute__(self, name):
         """Return ``_record_task_result`` partial with a dict containing skipped/failed if necessary"""
