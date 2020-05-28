@@ -166,7 +166,7 @@ func (k Kobe) GetResult(ctx context.Context, req *api.GetResultRequest) (*api.Ge
 	if val.Project == "" {
 		val.Project = "adhoc"
 	}
-	if val.Finished && val.Success {
+	if val.Finished{
 		bytes, err := ioutil.ReadFile(path.Join(constant.WorkDir, val.Project, val.Id, "result.json"))
 		if err != nil {
 			return nil, err
