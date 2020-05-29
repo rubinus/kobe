@@ -37,6 +37,7 @@ message Group {
 message Inventory{
   repeated Host hosts = 1;
   repeated Group groups = 2;
+  map<string, string> vars = 3;
 }
 
 message CreateProjectRequest {
