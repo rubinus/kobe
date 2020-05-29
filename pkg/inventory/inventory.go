@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"google.golang.org/grpc"
 	"github.com/KubeOperator/kobe/api"
 	"github.com/KubeOperator/kobe/pkg/constant"
+	"google.golang.org/grpc"
 	"os"
 )
 
@@ -58,9 +58,9 @@ func (kip kobeInventoryProvider) ListHandler() (Result, error) {
 	inventory, _ := kip.getInventory(id)
 	allGroup := make(map[string]map[string]interface{})
 	for _, group := range inventory.Groups {
-
-		m := map[string]interface{}{
-			"hosts": group.Hosts,
+		m := map[string]interface{}{}
+		if group.Hosts != nil {
+			m["hosts"] = group.Hosts
 		}
 		if group.Children != nil {
 			m["children"] = group.Children
