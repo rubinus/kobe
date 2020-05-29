@@ -56,24 +56,23 @@ func (kip kobeInventoryProvider) ListHandler() (Result, error) {
 		return nil, err
 	}
 	inventory, _ := kip.getInventory(id)
-	allGroup := make(map[string]map[string]interface{})
+	groups := make(map[string]map[string]interface{})
+	all := api.Group{
+		Name:     "all",
+		Hosts:    []string{},
+		Children: []string{},
+		Vars:     inventory.Vars,
+	}
 	for _, group := range inventory.Groups {
-		m := map[string]interface{}{}
-		if group.Hosts != nil {
-			m["hosts"] = group.Hosts
-		}
-		if group.Children != nil {
-			m["children"] = group.Children
-		}
-		if group.Vars != nil {
-			m["vars"] = group.Vars
-		}
-		allGroup[group.Name] = m
+		m := parseGroupToMap(*group)
+		groups[group.Name] = m
+		all.Children = append(all.Children, group.Name)
 	}
 	meta := map[string]interface{}{}
 	hostVars := map[string]interface{}{}
 	for _, host := range inventory.Hosts {
 		vars := make(map[string]interface{})
+		all.Hosts = append(all.Hosts, host.Name)
 		hostVars[host.Name] = map[string]interface{}{
 			"ansible_ssh_host": host.Ip,
 			"ansible_ssh_port": host.Port,
@@ -87,9 +86,24 @@ func (kip kobeInventoryProvider) ListHandler() (Result, error) {
 			hostVars["vars"] = vars
 		}
 	}
+	groups[all.Name] = parseGroupToMap(all)
 	meta["hostvars"] = hostVars
-	allGroup["_meta"] = meta
-	return allGroup, nil
+	groups["_meta"] = meta
+	return groups, nil
+}
+
+func parseGroupToMap(group api.Group) map[string]interface{} {
+	m := map[string]interface{}{}
+	if group.Hosts != nil {
+		m["hosts"] = group.Hosts
+	}
+	if group.Children != nil {
+		m["children"] = group.Children
+	}
+	if group.Vars != nil {
+		m["vars"] = group.Vars
+	}
+	return m
 }
 
 func (kip kobeInventoryProvider) getInventoryId() (string, error) {
