@@ -3,10 +3,10 @@ package server
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"github.com/KubeOperator/kobe/api"
 	"github.com/KubeOperator/kobe/pkg/constant"
 	"github.com/KubeOperator/kobe/pkg/util"
+	"io/ioutil"
 	"os"
 	"path"
 	"strings"
@@ -92,7 +92,9 @@ func (pm *ProjectManager) searchPlaybooks(projectName string) ([]string, error) 
 	}
 	var playbooks []string
 	for _, p := range rd {
-		if !p.IsDir() && strings.Contains(p.Name(), ".yml") {
+		if !p.IsDir() &&
+			strings.Contains(p.Name(), ".yml") &&
+			p.Name() != constant.AnsibleVariablesName {
 			playbooks = append(playbooks, p.Name())
 		}
 	}

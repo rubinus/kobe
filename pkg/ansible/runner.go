@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/KubeOperator/kobe/api"
 	"github.com/KubeOperator/kobe/pkg/constant"
+	"github.com/KubeOperator/kobe/pkg/util"
 	"io"
 	"os"
 	"os/exec"
@@ -72,6 +73,11 @@ func (p *PlaybookRunner) Run(ch chan []byte, result *api.Result) {
 	cmd := exec.Command(ansiblePath,
 		"-i", inventoryProviderPath,
 		path.Join(constant.ProjectDir, p.Project.Name, p.Playbook))
+	varPath := path.Join(constant.ProjectDir, p.Project.Name, constant.AnsibleVariablesName)
+	exists, _ := util.PathExists(varPath)
+	if exists {
+		cmd.Args = append(cmd.Args, "-e", varPath)
+	}
 	cmdEnv := make([]string, 0)
 	cmdEnv = append(cmdEnv, fmt.Sprintf("%s=%s", constant.TaskEnvKey, result.Id))
 	cmd.Env = append(os.Environ(), cmdEnv...)

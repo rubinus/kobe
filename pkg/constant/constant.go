@@ -8,8 +8,9 @@ import (
 const (
 	InventoryProviderBinPath = "kobe-inventory"
 	AnsiblePlaybookBinPath   = "ansible-playbook"
-	AnsibleBinPath   = "ansible"
+	AnsibleBinPath           = "ansible"
 	TaskEnvKey               = "KO_TASK_ID"
+	AnsibleVariablesName     = "variables.yml"
 )
 
 var (

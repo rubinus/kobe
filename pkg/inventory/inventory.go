@@ -96,12 +96,18 @@ func parseGroupToMap(group api.Group) map[string]interface{} {
 	m := map[string]interface{}{}
 	if group.Hosts != nil {
 		m["hosts"] = group.Hosts
+	} else {
+		m["hosts"] = []string{}
 	}
 	if group.Children != nil {
 		m["children"] = group.Children
+	} else {
+		m["children"] = []string{}
 	}
 	if group.Vars != nil {
 		m["vars"] = group.Vars
+	} else {
+		m["vars"] = map[string]string{}
 	}
 	return m
 }
