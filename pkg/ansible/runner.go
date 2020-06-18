@@ -76,6 +76,7 @@ func (p *PlaybookRunner) Run(ch chan []byte, result *api.Result) {
 	varPath := path.Join(constant.ProjectDir, p.Project.Name, constant.AnsibleVariablesName)
 	exists, _ := util.PathExists(varPath)
 	if exists {
+		varPath = "@" + varPath
 		cmd.Args = append(cmd.Args, "-e", varPath)
 	}
 	cmdEnv := make([]string, 0)
