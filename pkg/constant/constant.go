@@ -17,6 +17,7 @@ var (
 	BaseDir                 = "/var/kobe"
 	LibDir                  = path.Join(BaseDir, "lib")
 	DataDir                 = path.Join(BaseDir, "data")
+	CacheDir                = path.Join(DataDir, "cache")
 	WorkDir                 = path.Join(BaseDir, "work")
 	AnsibleLibDir           = path.Join(LibDir, "ansible")
 	ProjectDir              = path.Join(DataDir, "project")

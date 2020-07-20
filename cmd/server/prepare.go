@@ -9,6 +9,7 @@ import (
 func prepareStart() error {
 	funcs := []func() error{
 		makeDataDir,
+		makeCacheDir,
 		lookUpAnsibleBinPath,
 		lookUpKobeInventoryBinPath,
 		cleanWorkPath,
@@ -22,11 +23,12 @@ func prepareStart() error {
 }
 
 func makeDataDir() error {
-	err := os.MkdirAll(constant.ProjectDir, 0755)
-	if err != nil {
-		return err
-	}
-	return nil
+	return os.MkdirAll(constant.ProjectDir, 0755)
+
+}
+
+func makeCacheDir() error {
+	return os.MkdirAll(constant.CacheDir, 0755)
 }
 
 func lookUpAnsibleBinPath() error {
