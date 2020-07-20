@@ -40,4 +40,4 @@ clean:
 
 docker:
 	@echo "build docker images"
-	docker build -t kobe-server --build-arg GOPROXY=$(GOPROXY) .
+	docker build -t kobe-server:master --build-arg GOPROXY=$(GOPROXY) .
