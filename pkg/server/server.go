@@ -52,6 +52,9 @@ func (k Kobe) ListProject(ctx context.Context, req *api.ListProjectRequest) (*ap
 
 func (k Kobe) GetInventory(ctx context.Context, req *api.GetInventoryRequest) (*api.GetInventoryResponse, error) {
 	item, _ := k.inventoryCache.Get(req.Id)
+	if item == nil {
+		return nil,errors.New("inventory is expire")
+	}
 	resp := &api.GetInventoryResponse{
 		Item: item.(*api.Inventory),
 	}
@@ -166,7 +169,7 @@ func (k Kobe) GetResult(ctx context.Context, req *api.GetResultRequest) (*api.Ge
 	if val.Project == "" {
 		val.Project = "adhoc"
 	}
-	if val.Finished{
+	if val.Finished {
 		bytes, err := ioutil.ReadFile(path.Join(constant.WorkDir, val.Project, val.Id, "result.json"))
 		if err != nil {
 			return nil, err
