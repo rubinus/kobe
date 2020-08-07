@@ -7,8 +7,12 @@ import (
 	"fmt"
 	"github.com/KubeOperator/kobe/api"
 	"github.com/KubeOperator/kobe/pkg/constant"
+	uuid "github.com/satori/go.uuid"
 	"google.golang.org/grpc"
+	"io/ioutil"
+	"log"
 	"os"
+	"path"
 )
 
 type Result map[string]map[string]interface{}
@@ -77,7 +81,14 @@ func (kip kobeInventoryProvider) ListHandler() (Result, error) {
 			"ansible_ssh_host": host.Ip,
 			"ansible_ssh_port": host.Port,
 			"ansible_ssh_user": host.User,
-			"ansible_ssh_pass": host.Password,
+		}
+		if host.Password != "" {
+			m := hostVars[host.Name].(map[string]interface{})
+			m["ansible_ssh_pass"] = host.Password
+		}
+		if host.PrivateKey != "" {
+			m := hostVars[host.Name].(map[string]interface{})
+			m["ansible_ssh_key_file"] = generatePrivateKeyFile(host.Name, host.PrivateKey)
 		}
 		if host.Vars != nil {
 			for k, v := range host.Vars {
@@ -127,4 +138,20 @@ func (kip kobeInventoryProvider) createConnection() (*grpc.ClientConn, error) {
 		return nil, err
 	}
 	return conn, nil
+}
+
+func generatePrivateKeyFile(hostName string, content string) string {
+	fileName := fmt.Sprintf("%s-%s.pem", hostName, uuid.NewV4().String())
+	p := path.Join(constant.KeyDir, fileName)
+	f, err := os.OpenFile(p, os.O_CREATE, 0600)
+	if err != nil {
+		log.Println(err)
+		return ""
+	}
+	err = ioutil.WriteFile(f.Name(), []byte(content), 0600)
+	if err != nil {
+		log.Println(err)
+		return ""
+	}
+	return p
 }

@@ -18,6 +18,7 @@ var (
 	LibDir                  = path.Join(BaseDir, "lib")
 	DataDir                 = path.Join(BaseDir, "data")
 	CacheDir                = path.Join(DataDir, "cache")
+	KeyDir                  = path.Join(DataDir, "key")
 	WorkDir                 = path.Join(BaseDir, "work")
 	AnsibleLibDir           = path.Join(LibDir, "ansible")
 	ProjectDir              = path.Join(DataDir, "project")

@@ -10,6 +10,7 @@ func prepareStart() error {
 	funcs := []func() error{
 		makeDataDir,
 		makeCacheDir,
+		makeKeyDir,
 		lookUpAnsibleBinPath,
 		lookUpKobeInventoryBinPath,
 		cleanWorkPath,
@@ -29,6 +30,10 @@ func makeDataDir() error {
 
 func makeCacheDir() error {
 	return os.MkdirAll(constant.CacheDir, 0755)
+}
+
+func makeKeyDir() error {
+	return os.MkdirAll(constant.KeyDir, 0755)
 }
 
 func lookUpAnsibleBinPath() error {
