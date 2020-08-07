@@ -88,7 +88,7 @@ func (kip kobeInventoryProvider) ListHandler() (Result, error) {
 		}
 		if host.PrivateKey != "" {
 			m := hostVars[host.Name].(map[string]interface{})
-			m["ansible_ssh_key_file"] = generatePrivateKeyFile(host.Name, host.PrivateKey)
+			m["ansible_ssh_private_key_file"] = generatePrivateKeyFile(host.Name, host.PrivateKey)
 		}
 		if host.Vars != nil {
 			for k, v := range host.Vars {
