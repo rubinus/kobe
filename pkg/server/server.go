@@ -9,6 +9,8 @@ import (
 	"github.com/patrickmn/go-cache"
 	uuid "github.com/satori/go.uuid"
 	"io/ioutil"
+	"log"
+	"os"
 	"path"
 	"time"
 )
@@ -53,7 +55,7 @@ func (k Kobe) ListProject(ctx context.Context, req *api.ListProjectRequest) (*ap
 func (k Kobe) GetInventory(ctx context.Context, req *api.GetInventoryRequest) (*api.GetInventoryResponse, error) {
 	item, _ := k.inventoryCache.Get(req.Id)
 	if item == nil {
-		return nil,errors.New("inventory is expire")
+		return nil, errors.New("inventory is expire")
 	}
 	resp := &api.GetInventoryResponse{
 		Item: item.(*api.Inventory),
@@ -175,6 +177,11 @@ func (k Kobe) GetResult(ctx context.Context, req *api.GetResultRequest) (*api.Ge
 			return nil, err
 		}
 		val.Content = string(bytes)
+		// 取完数据后删除缓存目录
+		err = os.RemoveAll(path.Join(constant.WorkDir, val.Project, val.Id))
+		if err != nil {
+			log.Println(err)
+		}
 	}
 	return &api.GetResultResponse{Item: val}, nil
 }

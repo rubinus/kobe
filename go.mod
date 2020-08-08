@@ -7,6 +7,7 @@ require (
 	github.com/go-git/go-git/v5 v5.0.0
 	github.com/golang/protobuf v1.4.1
 	github.com/patrickmn/go-cache v2.1.0+incompatible
+	github.com/prometheus/common v0.4.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/spf13/cobra v0.0.6
 	github.com/spf13/viper v1.4.0

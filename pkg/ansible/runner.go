@@ -6,6 +6,7 @@ import (
 	"github.com/KubeOperator/kobe/api"
 	"github.com/KubeOperator/kobe/pkg/constant"
 	"github.com/KubeOperator/kobe/pkg/util"
+	"github.com/prometheus/common/log"
 	"io"
 	"os"
 	"os/exec"
@@ -43,8 +44,8 @@ func (a *AdhocRunner) Run(ch chan []byte, result *api.Result) {
 		result.Message = err.Error()
 		return
 	}
-
 	cmd := exec.Command(ansiblePath,
+		"-e", "host_key_checking=False",
 		"-i", inventoryProviderPath, a.Pattern, "-m", a.Module)
 	if a.Param != "" {
 		cmd.Args = append(cmd.Args, "-a", a.Param)
@@ -52,6 +53,7 @@ func (a *AdhocRunner) Run(ch chan []byte, result *api.Result) {
 	cmdEnv := make([]string, 0)
 	cmdEnv = append(cmdEnv, fmt.Sprintf("%s=%s", constant.TaskEnvKey, result.Id))
 	cmd.Env = append(os.Environ(), cmdEnv...)
+	log.Info("id:%s  content :%s", result.Id, cmd.String())
 	runCmd(ch, "adhoc", cmd, result)
 
 }
@@ -82,8 +84,8 @@ func (p *PlaybookRunner) Run(ch chan []byte, result *api.Result) {
 	cmdEnv := make([]string, 0)
 	cmdEnv = append(cmdEnv, fmt.Sprintf("%s=%s", constant.TaskEnvKey, result.Id))
 	cmd.Env = append(os.Environ(), cmdEnv...)
+	log.Info("id:%s  content :%s", result.Id, cmd.String())
 	runCmd(ch, p.Project.Name, cmd, result)
-	fmt.Println(result.Id)
 }
 
 func runCmd(ch chan []byte, projectName string, cmd *exec.Cmd, result *api.Result) {
@@ -130,7 +132,6 @@ func runCmd(ch chan []byte, projectName string, cmd *exec.Cmd, result *api.Resul
 	}
 	close(ch)
 
-	fmt.Println(cmd.String())
 	if err = cmd.Wait(); err != nil {
 		result.Success = false
 		result.Message = stderr.String()
