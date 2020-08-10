@@ -5,7 +5,7 @@ ARG GOPROXY
 ENV GOPROXY=$GOPROXY
 ENV GO111MODULE=on
 ENV GOOS=linux
-ENV GOARCH=amd64
+ENV GOARCH=$GOARCH
 ENV CGO_ENABLED=0
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
   && apk update \
