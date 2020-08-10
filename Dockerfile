@@ -16,10 +16,8 @@ RUN go mod download
 COPY . .
 RUN make build_server_linux
 
-FROM lucasrolff/python38-ansible:latest
+FROM registry.cn-qingdao.aliyuncs.com/kubeoperator/ansible:py3
 
-RUN apt install sshpass
-RUN pip install netaddr
 RUN echo -e "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null" > /root/.ssh/config
 COPY --from=stage-build /build/kobe/dist/etc /etc/
 COPY --from=stage-build /build/kobe/dist/usr /usr/
