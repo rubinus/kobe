@@ -14,7 +14,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-RUN make build_server_linux
+RUN make build_server_linux GOARCH=$GOARCH
 
 FROM kubeoperator/ansible:py3
 
