@@ -9,8 +9,9 @@ ENV GO111MODULE=on
 ENV GOOS=linux
 ENV GOARCH=$GOARCH
 ENV CGO_ENABLED=0
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
-  && apk update \
+
+
+RUN  apk update \
   && apk add git \
   && apk add make
 COPY go.mod go.sum ./
