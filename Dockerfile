@@ -1,10 +1,8 @@
 FROM golang:1.14-alpine as stage-build
 LABEL stage=stage-build
 WORKDIR /build/kobe
-ARG GOPROXY
 ARG GOARCH
 
-ENV GOPROXY=$GOPROXY
 ENV GO111MODULE=on
 ENV GOOS=linux
 ENV GOARCH=$GOARCH
