@@ -18,7 +18,10 @@ RUN make build_server_linux GOARCH=$GOARCH
 
 FROM kubeoperator/ansible:py3
 
-RUN echo -e "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null" > /root/.ssh/config
+RUN mkdir /root/.ssh  \
+    && touch /root/.ssh/config \
+    && echo -e "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null" > /root/.ssh/config
+
 COPY --from=stage-build /build/kobe/dist/etc /etc/
 COPY --from=stage-build /build/kobe/dist/usr /usr/
 COPY --from=stage-build /build/kobe/dist/var /var/
