@@ -17,9 +17,10 @@ RUN go mod download
 COPY . .
 RUN make build_server_linux GOARCH=$GOARCH
 
-FROM lucasrolff/python38-ansible:latest
+FROM alpinelinux/ansible:latest
 
-RUN yum install -y  sshpass && pip install netaddr
+RUN apk add sshpass
+    && pip install netaddr
 
 RUN mkdir /root/.ssh  \
     && touch /root/.ssh/config \
