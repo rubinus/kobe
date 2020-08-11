@@ -20,7 +20,7 @@ RUN make build_server_linux GOARCH=$GOARCH
 FROM alpinelinux/ansible:latest
 
 RUN apk add sshpass \
-    && pip install netaddr
+    && pip3 install netaddr
 
 RUN mkdir /root/.ssh  \
     && touch /root/.ssh/config \
