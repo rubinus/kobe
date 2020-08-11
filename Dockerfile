@@ -19,6 +19,8 @@ RUN make build_server_linux GOARCH=$GOARCH
 
 FROM kubeoperator/ansible:py3
 
+RUN yum install -y  sshpass
+
 RUN mkdir /root/.ssh  \
     && touch /root/.ssh/config \
     && echo -e "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null" > /root/.ssh/config
