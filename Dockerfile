@@ -17,9 +17,9 @@ RUN go mod download
 COPY . .
 RUN make build_server_linux GOARCH=$GOARCH
 
-FROM kubeoperator/ansible:py3
+FROM lucasrolff/python38-ansible:latest
 
-RUN yum install -y  sshpass
+RUN yum install -y  sshpass && pip install netaddr
 
 RUN mkdir /root/.ssh  \
     && touch /root/.ssh/config \
