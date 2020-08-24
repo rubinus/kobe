@@ -1,6 +1,7 @@
 syntax = "proto3";
 
-package api;
+option go_package = ".;api";
+
 
 service KobeApi {
   rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse){}
