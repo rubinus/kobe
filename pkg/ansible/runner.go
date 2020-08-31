@@ -84,7 +84,7 @@ func (p *PlaybookRunner) Run(ch chan []byte, result *api.Result) {
 	cmdEnv := make([]string, 0)
 	cmdEnv = append(cmdEnv, fmt.Sprintf("%s=%s", constant.TaskEnvKey, result.Id))
 	cmd.Env = append(os.Environ(), cmdEnv...)
-	log.Info("id:%s  content :%s", result.Id, cmd.String())
+	log.Infof("id:%s  content :%s", result.Id, cmd.String())
 	runCmd(ch, p.Project.Name, cmd, result)
 }
 
