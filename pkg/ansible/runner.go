@@ -11,7 +11,6 @@ import (
 	"os"
 	"os/exec"
 	"path"
-	"syscall"
 	"text/template"
 	"time"
 )
@@ -138,8 +137,8 @@ func runCmd(ch chan []byte, projectName string, cmd *exec.Cmd, result *api.Resul
 		result.Message = stderr.String()
 		return
 	}
-	var wstatus syscall.WaitStatus
-	_, err = syscall.Wait4(-1, &wstatus, 0, nil)
+	c := exec.Command("sh", "ps aux | grep ssh  | grep defunct | awk -F ' ' '{kill -9  $2}'")
+	_ = c.Run()
 	result.Success = true
 }
 
