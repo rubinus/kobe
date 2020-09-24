@@ -11,7 +11,6 @@ import (
 	"os"
 	"os/exec"
 	"path"
-	"syscall"
 	"text/template"
 	"time"
 )
@@ -132,14 +131,6 @@ func runCmd(ch chan []byte, projectName string, cmd *exec.Cmd, result *api.Resul
 		}
 	}
 	close(ch)
-	defer func() {
-		fmt.Println("kill")
-		var wstatus syscall.WaitStatus
-		_, err = syscall.Wait4(-1, &wstatus, 0, nil)
-		if err != nil {
-			fmt.Println(err.Error())
-		}
-	}()
 	if err = cmd.Wait(); err != nil {
 		result.Success = false
 		result.Message = stderr.String()
