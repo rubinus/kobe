@@ -34,4 +34,4 @@ VOLUME ["/var/kobe/data"]
 
 EXPOSE 8080
 
-CMD ["kobe-server"]
+CMD ["bash","kobe-server"]
