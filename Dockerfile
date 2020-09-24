@@ -30,8 +30,10 @@ COPY --from=stage-build /build/kobe/dist/etc /etc/
 COPY --from=stage-build /build/kobe/dist/usr /usr/
 COPY --from=stage-build /build/kobe/dist/var /var/
 
+RUN echo 'kobe-server' >> /root/entrypoint.sh
+
 VOLUME ["/var/kobe/data"]
 
 EXPOSE 8080
 
-CMD ["sh","kobe-server"]
+CMD ["sh","/root/entrypoint.sh"]
