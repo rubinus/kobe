@@ -157,7 +157,7 @@ func (c *KobeClient) ListResult() ([]*api.Result, error) {
 
 func (c *KobeClient) createConnection() (*grpc.ClientConn, error) {
 	address := fmt.Sprintf("%s:%d", c.host, c.port)
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(100*1024*1024)))
 	if err != nil {
 		return nil, err
 	}
