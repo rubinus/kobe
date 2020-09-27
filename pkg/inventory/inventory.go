@@ -90,6 +90,10 @@ func (kip kobeInventoryProvider) ListHandler() (Result, error) {
 			m := hostVars[host.Name].(map[string]interface{})
 			m["ansible_ssh_private_key_file"] = generatePrivateKeyFile(host.Name, host.PrivateKey)
 		}
+		if host.ProxyConfig.Enable {
+			m := hostVars[host.Name].(map[string]interface{})
+			m["ansible_ssh_common_args"] = fmt.Sprintf("-o ProxyCommand=\"sshpass -p %s ssh -W  %%h:%%p -p %d -q %s@%s\" -o StrictHostKeyChecking=no", host.ProxyConfig.Password, host.ProxyConfig.Port, host.ProxyConfig.User, host.ProxyConfig.Ip)
+		}
 		if host.Vars != nil {
 			for k, v := range host.Vars {
 				vars[k] = v
