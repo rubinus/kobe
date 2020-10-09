@@ -22,7 +22,7 @@ func main() {
 		log.Fatal(err)
 	}
 	server := newServer()
-	log.Printf("kobe server lisen at: %s", address)
+	log.Printf("kobe server listen at: %s", address)
 	if err := server.Serve(*lis); err != nil {
 		log.Fatal(err)
 	}
