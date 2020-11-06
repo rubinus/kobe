@@ -54,7 +54,7 @@ func (c KobeClient) ListProject() ([]*api.Project, error) {
 	return resp.Items, nil
 }
 
-func (c KobeClient) RunPlaybook(project, playbook string, inventory api.Inventory) (*api.Result, error) {
+func (c KobeClient) RunPlaybook(project, playbook string, inventory *api.Inventory) (*api.Result, error) {
 	conn, err := c.createConnection()
 	if err != nil {
 		return nil, err
@@ -64,7 +64,7 @@ func (c KobeClient) RunPlaybook(project, playbook string, inventory api.Inventor
 	request := &api.RunPlaybookRequest{
 		Project:   project,
 		Playbook:  playbook,
-		Inventory: &inventory,
+		Inventory: inventory,
 	}
 	req, err := client.RunPlaybook(context.Background(), request)
 	if err != nil {
@@ -73,7 +73,7 @@ func (c KobeClient) RunPlaybook(project, playbook string, inventory api.Inventor
 	return req.Result, nil
 }
 
-func (c KobeClient) RunAdhoc(pattern, module, param string, inventory api.Inventory) (*api.Result, error) {
+func (c KobeClient) RunAdhoc(pattern, module, param string, inventory *api.Inventory) (*api.Result, error) {
 	conn, err := c.createConnection()
 	if err != nil {
 		return nil, err
@@ -81,7 +81,7 @@ func (c KobeClient) RunAdhoc(pattern, module, param string, inventory api.Invent
 	defer conn.Close()
 	client := api.NewKobeApiClient(conn)
 	request := &api.RunAdhocRequest{
-		Inventory: &inventory,
+		Inventory: inventory,
 		Module:    module,
 		Param:     param,
 		Pattern:   pattern,
