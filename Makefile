@@ -20,6 +20,12 @@ build_server_linux:
 	mkdir -p $(BUILDDIR)/$(LIB_DIR) && cp -r     $(BASEPATH)/ansible $(BUILDDIR)/$(LIB_DIR)
 	mkdir -p $(BUILDDIR)/$(CONFIG_DIR) && cp -r  $(BASEPATH)/conf/* $(BUILDDIR)/$(CONFIG_DIR)
 
+build_darwin_linux:
+	GOOS=darwin  GOARCH=$(GOARCH) $(GOBUILD) -o $(BUILDDIR)/$(BIN_DIR)/$(KOBE_SERVER_NAME) $(KOBE_SRC)/server/*.go
+	GOOS=darwin  GOARCH=$(GOARCH) $(GOBUILD) -o $(BUILDDIR)/$(BIN_DIR)/$(KOBE_INVENTORY_NAME) $(KOBE_SRC)/inventory/*.go
+	mkdir -p $(BUILDDIR)/$(LIB_DIR) && cp -r     $(BASEPATH)/ansible $(BUILDDIR)/$(LIB_DIR)
+	mkdir -p $(BUILDDIR)/$(CONFIG_DIR) && cp -r  $(BASEPATH)/conf/* $(BUILDDIR)/$(CONFIG_DIR)
+
 clean:
 	rm -fr $(BUILDDIR)
 
