@@ -8,4 +8,5 @@ host_key_checking = False
 gathering = smart
 fact_caching = jsonfile
 fact_caching_connection = /var/kobe/data/cache
-forks = 20
+forks = {{.forks}}
+timeout = {{.timeout}}

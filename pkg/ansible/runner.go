@@ -7,6 +7,7 @@ import (
 	"github.com/KubeOperator/kobe/pkg/constant"
 	"github.com/KubeOperator/kobe/pkg/util"
 	"github.com/prometheus/common/log"
+	"github.com/spf13/viper"
 	"io"
 	"io/ioutil"
 	"os"
@@ -171,7 +172,7 @@ func renderConfig(workPath string) error {
 	if err != nil {
 		return err
 	}
-	data := map[string]interface{}{}
+	data := viper.GetStringMap("ansible")
 	if err := t.Execute(file, data); err != nil {
 		return err
 	}
