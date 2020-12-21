@@ -16,8 +16,8 @@ func newTcpListener(address string) (*net.Listener, error) {
 }
 func newServer() *grpc.Server {
 	options := []grpc.ServerOption{
-		grpc.MaxRecvMsgSize(100 * 1024 * 1024),
-		grpc.MaxSendMsgSize(100 * 1024 * 1024),
+		grpc.MaxRecvMsgSize(100 * 1024 * 1024 * 1024),
+		grpc.MaxSendMsgSize(100 * 1024 * 1024 * 1024),
 	}
 	gs := grpc.NewServer(options...)
 	kobe := server.NewKobe()
