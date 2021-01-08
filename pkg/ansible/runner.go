@@ -7,24 +7,18 @@ import (
 	"github.com/KubeOperator/kobe/pkg/constant"
 	"github.com/KubeOperator/kobe/pkg/util"
 	"github.com/prometheus/common/log"
-	"github.com/spf13/viper"
 	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path"
-	"text/template"
 	"time"
-)
-
-const (
-	ansibleCfgFileName   = "ansible.cfg"
-	ansiblePluginDirName = "plugins"
 )
 
 type PlaybookRunner struct {
 	Project  api.Project
 	Playbook string
+	Tag      string
 }
 
 type AdhocRunner struct {
@@ -82,6 +76,9 @@ func (p *PlaybookRunner) Run(ch chan []byte, result *api.Result) {
 	if exists {
 		varPath = "@" + varPath
 		cmd.Args = append(cmd.Args, "-e", varPath)
+	}
+	if p.Tag != "" {
+		cmd.Args = append(cmd.Args, "-t", p.Tag)
 	}
 	cmdEnv := make([]string, 0)
 	cmdEnv = append(cmdEnv, fmt.Sprintf("%s=%s", constant.TaskEnvKey, result.Id))
@@ -151,43 +148,43 @@ func initWorkSpace(projectName string) (string, error) {
 	if err := os.MkdirAll(workPath, 0755); err != nil {
 		return "", err
 	}
-	if err := renderConfig(workPath); err != nil {
-		return "", err
-	}
-
-	if err := initPlugin(workPath); err != nil {
-		return "", err
-	}
+	//if err := renderConfig(workPath); err != nil {
+	//	return "", err
+	//}
+	//
+	//if err := initPlugin(workPath); err != nil {
+	//	return "", err
+	//}
 	return workPath, nil
 }
 
-func renderConfig(workPath string) error {
-	tmpl := constant.AnsibleTemplateFilePath
-	file, err := os.OpenFile(path.Join(workPath, ansibleCfgFileName), os.O_CREATE|os.O_RDWR, 0755)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	t, err := template.ParseFiles(tmpl)
-	if err != nil {
-		return err
-	}
-	data := viper.GetStringMap("ansible")
-	if err := t.Execute(file, data); err != nil {
-		return err
-	}
-	return nil
-}
-
-func initPlugin(workPath string) error {
-	projectPluginDir := path.Join(workPath, ansiblePluginDirName)
-	_, err := os.Stat(projectPluginDir)
-	if os.IsNotExist(err) {
-		if err := os.Symlink(constant.AnsiblePluginDir, path.Join(workPath, ansiblePluginDirName))
-			err != nil {
-			return err
-		}
-		return nil
-	}
-	return err
-}
+//func renderConfig(workPath string) error {
+//	tmpl := constant.AnsibleTemplateFilePath
+//	file, err := os.OpenFile(path.Join(workPath, ansibleCfgFileName), os.O_CREATE|os.O_RDWR, 0755)
+//	if err != nil {
+//		return err
+//	}
+//	defer file.Close()
+//	t, err := template.ParseFiles(tmpl)
+//	if err != nil {
+//		return err
+//	}
+//	data := viper.GetStringMap("ansible")
+//	if err := t.Execute(file, data); err != nil {
+//		return err
+//	}
+//	return nil
+//}
+//
+//func initPlugin(workPath string) error {
+//	projectPluginDir := path.Join(workPath, ansiblePluginDirName)
+//	_, err := os.Stat(projectPluginDir)
+//	if os.IsNotExist(err) {
+//		if err := os.Symlink(constant.AnsiblePluginDir, path.Join(workPath, ansiblePluginDirName))
+//			err != nil {
+//			return err
+//		}
+//		return nil
+//	}
+//	return err
+//}

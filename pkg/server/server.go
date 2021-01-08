@@ -146,7 +146,7 @@ func (k *Kobe) RunPlaybook(ctx context.Context, req *api.RunPlaybookRequest) (*a
 	k.taskCache.Set(result.Id, &result, cache.DefaultExpiration)
 	k.chCache.Set(result.Id, ch, cache.DefaultExpiration)
 	k.inventoryCache.Set(result.Id, req.Inventory, cache.DefaultExpiration)
-	runner, err := rm.CreatePlaybookRunner(req.Project, req.Playbook)
+	runner, err := rm.CreatePlaybookRunner(req.Project, req.Playbook, req.Tag)
 	if err != nil {
 		return nil, err
 	}
