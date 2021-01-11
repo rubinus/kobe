@@ -20,6 +20,7 @@ RUN make build_server_linux GOARCH=$GOARCH
 FROM alpinelinux/ansible:latest
 
 RUN apk add sshpass \
+    && apk add rsync \
     && apk add openssl \
     && pip3 install netaddr \
     && pip3 install pywinrm
