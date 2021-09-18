@@ -12,7 +12,7 @@ forks = {{.forks}}
 timeout = {{.timeout}}
 
 [ssh_connection]
-ssh_args = -o ControlMaster=auto -o ControlPersist=3600s
+ssh_args = -o ControlMaster=auto -o ControlPersist=3600s -o ServerAliveInterval=30 -o ServerAliveCountMax=2
 
 [privilege_escalation]
 become = True
