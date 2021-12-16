@@ -5,14 +5,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/KubeOperator/kobe/api"
-	"github.com/KubeOperator/kobe/pkg/constant"
-	uuid "github.com/satori/go.uuid"
-	"google.golang.org/grpc"
 	"io/ioutil"
 	"log"
 	"os"
 	"path"
+
+	"github.com/KubeOperator/kobe/api"
+	"github.com/KubeOperator/kobe/pkg/constant"
+	uuid "github.com/satori/go.uuid"
+	"google.golang.org/grpc"
 )
 
 type Result map[string]map[string]interface{}
@@ -82,9 +83,12 @@ func (kip kobeInventoryProvider) ListHandler() (Result, error) {
 	for _, host := range inventory.Hosts {
 		all.Hosts = append(all.Hosts, host.Name)
 		hostVars[host.Name] = map[string]interface{}{
-			"ansible_ssh_host": host.Ip,
 			"ansible_ssh_port": host.Port,
 			"ansible_ssh_user": host.User,
+		}
+		if host.Ip != "" {
+			m := hostVars[host.Name].(map[string]interface{})
+			m["ansible_ssh_host"] = host.Ip
 		}
 		if host.Password != "" {
 			m := hostVars[host.Name].(map[string]interface{})
