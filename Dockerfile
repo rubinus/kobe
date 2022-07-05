@@ -1,17 +1,19 @@
 FROM golang:1.14-alpine as stage-build
 LABEL stage=stage-build
 WORKDIR /build/kobe
+ARG GOPROXY
 ARG GOARCH
 
-ENV GO111MODULE=on
-ENV GOOS=linux
-ENV GOARCH=$GOARCH
-ENV CGO_ENABLED=0
-
+ENV GO111MODULE=on \
+    GOPROXY=$GOPROXY \
+    CGO_ENABLED=0 \
+    GOOS=linux \
+    GOARCH=$GOARCH
 
 RUN  apk update \
   && apk add git \
   && apk add make
+
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
@@ -24,7 +26,6 @@ RUN apk add sshpass \
     && apk add openssl \
     && pip3 install netaddr \
     && pip3 install pywinrm
-
 
 RUN mkdir /root/.ssh  \
     && touch /root/.ssh/config \
