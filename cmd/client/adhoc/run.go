@@ -7,7 +7,7 @@ import (
 	"github.com/ghodss/yaml"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"io/ioutil"
+
 	"log"
 	"os"
 	"time"
@@ -25,7 +25,7 @@ var adhocRunCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		content, err := ioutil.ReadFile(inventoryPath)
+		content, err := os.ReadFile(inventoryPath)
 		if err != nil {
 			log.Fatal(err)
 		}

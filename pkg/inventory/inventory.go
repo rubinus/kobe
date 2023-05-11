@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+
 	"log"
 	"os"
 	"path"
@@ -160,7 +160,7 @@ func generatePrivateKeyFile(hostName string, content string) string {
 		log.Println(err)
 		return ""
 	}
-	err = ioutil.WriteFile(f.Name(), []byte(content), 0600)
+	err = os.WriteFile(f.Name(), []byte(content), 0600)
 	if err != nil {
 		log.Println(err)
 		return ""

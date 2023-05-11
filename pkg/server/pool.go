@@ -1,8 +1,8 @@
 package server
 
 import (
-	"github.com/spf13/viper"
 	"github.com/prometheus/common/log"
+	"github.com/spf13/viper"
 )
 
 type TaskFunc func()

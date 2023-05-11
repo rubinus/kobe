@@ -20,7 +20,7 @@ type KobeClient struct {
 	port int
 }
 
-func (c *KobeClient) CreateProject(name string, source string) (*api.Project, error) {
+func (c *KobeClient) CreateProject(name string, source string, inventByte []byte) (*api.Project, error) {
 	conn, err := c.createConnection()
 	if err != nil {
 		return nil, err
@@ -28,8 +28,9 @@ func (c *KobeClient) CreateProject(name string, source string) (*api.Project, er
 	defer conn.Close()
 	client := api.NewKobeApiClient(conn)
 	request := api.CreateProjectRequest{
-		Name:   name,
-		Source: source,
+		Name:      name,
+		Source:    source,
+		Inventory: inventByte,
 	}
 	resp, err := client.CreateProject(context.Background(), &request)
 	if err != nil {

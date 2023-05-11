@@ -29,7 +29,7 @@ clean:
 
 docker:
 	@echo "build docker images"
-	docker build -t kubeoperator/kobe:master --build-arg GOPROXY=$(GOPROXY) --build-arg GOARCH=$(GOARCH) .
+	docker build -t rubinus/kobe:v1.0 .
 
 generate_grpc:
 	protoc --go_out=plugins=grpc:./api ./api/kobe.proto

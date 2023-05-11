@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v2"
-	"io/ioutil"
+
 	"log"
 	"os"
 	"time"
@@ -31,7 +31,7 @@ var playbookRunCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		content, err := ioutil.ReadFile(inventoryPath)
+		content, err := os.ReadFile(inventoryPath)
 		if err != nil {
 			log.Fatal(err)
 		}

@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/spf13/viper"
 	"github.com/KubeOperator/kobe/pkg/config"
 	"github.com/KubeOperator/kobe/pkg/constant"
+	"github.com/spf13/viper"
 	"log"
 )
 

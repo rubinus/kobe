@@ -8,7 +8,7 @@ import (
 	"github.com/KubeOperator/kobe/pkg/constant"
 	"github.com/patrickmn/go-cache"
 	uuid "github.com/satori/go.uuid"
-	"io/ioutil"
+
 	"log"
 	"os"
 	"path"
@@ -33,7 +33,7 @@ func NewKobe() *Kobe {
 
 func (k *Kobe) CreateProject(ctx context.Context, req *api.CreateProjectRequest) (*api.CreateProjectResponse, error) {
 	pm := ProjectManager{}
-	p, err := pm.CreateProject(req.Name, req.Source)
+	p, err := pm.CreateProject(req.Name, req.Source, req.Inventory)
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +176,7 @@ func (k *Kobe) GetResult(ctx context.Context, req *api.GetResultRequest) (*api.G
 		val.Project = "adhoc"
 	}
 	if val.Finished {
-		bytes, err := ioutil.ReadFile(path.Join(constant.WorkDir, val.Project, val.Id, "result.json"))
+		bytes, err := os.ReadFile(path.Join(constant.WorkDir, val.Project, val.Id, "result.json"))
 		if err != nil {
 			return nil, err
 		}

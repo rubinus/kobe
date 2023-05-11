@@ -5,8 +5,7 @@ import (
 	"fmt"
 	"github.com/KubeOperator/kobe/api"
 	"github.com/KubeOperator/kobe/pkg/constant"
-	"github.com/KubeOperator/kobe/pkg/util"
-	"io/ioutil"
+
 	"os"
 	"path"
 	"strings"
@@ -29,7 +28,7 @@ func (pm ProjectManager) GetProject(name string) (*api.Project, error) {
 }
 
 func (pm ProjectManager) SearchProjects() ([]*api.Project, error) {
-	rd, err := ioutil.ReadDir(constant.ProjectDir)
+	rd, err := os.ReadDir(constant.ProjectDir)
 	if err != nil {
 		return nil, err
 	}
@@ -64,13 +63,17 @@ func (pm ProjectManager) IsProjectExists(name string) (bool, error) {
 	return exists, nil
 }
 
-func (pm ProjectManager) CreateProject(name, source string) (*api.Project, error) {
+func (pm ProjectManager) CreateProject(name, source string, inventByte []byte) (*api.Project, error) {
 	projectPath := path.Join(constant.ProjectDir, name)
 	if err := os.MkdirAll(projectPath, 0755); err != nil {
 		return nil, err
 	}
-	if err := util.CloneRepository(source, projectPath); err != nil {
-		_ = os.Remove(projectPath)
+	//if err := util.CloneRepository(source, projectPath); err != nil {
+	//	_ = os.Remove(projectPath)
+	//	return nil, err
+	//}
+	err := os.WriteFile(path.Join(projectPath, source), inventByte, 0755)
+	if err != nil {
 		return nil, err
 	}
 	playbooks, err := pm.searchPlaybooks(name)
@@ -86,7 +89,7 @@ func (pm ProjectManager) CreateProject(name, source string) (*api.Project, error
 
 func (pm *ProjectManager) searchPlaybooks(projectName string) ([]string, error) {
 	p := path.Join(constant.ProjectDir, projectName)
-	rd, err := ioutil.ReadDir(p)
+	rd, err := os.ReadDir(p)
 	if err != nil {
 		return nil, err
 	}
