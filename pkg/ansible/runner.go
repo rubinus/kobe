@@ -8,7 +8,6 @@ import (
 	"github.com/KubeOperator/kobe/pkg/util"
 	"github.com/prometheus/common/log"
 	"io"
-
 	"os"
 	"os/exec"
 	"path"
@@ -132,7 +131,8 @@ func runCmd(ch chan []byte, projectName string, cmd *exec.Cmd, result *api.Resul
 	close(ch)
 	if err = cmd.Wait(); err != nil {
 		result.Success = false
-		b, err := os.ReadAll(stderr)
+
+		b, err := io.ReadAll(stderr)
 		if err != nil {
 			log.Error(err)
 			return
